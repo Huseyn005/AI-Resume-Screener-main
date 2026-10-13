@@ -1,14 +1,16 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { extractPdfText, scoreResume } from "./scoring";
-import { clearResumes, deleteResumes, putResume } from "./resume-store";
+import { analyzeResumes, type BackendAnalysisResult } from "./api";
+import { clearResumes, deleteResumes, getResume, putResume } from "./resume-store";
 
 export type Candidate = {
   id: string;
   name: string;
   role: string;
-  score: number;
+  score: number | null;
   skills: string[];
+  topSkills?: string[];
   experience: string;
   summary: string;
   resumeId?: string;
@@ -17,6 +19,10 @@ export type Candidate = {
   strengths?: string[];
   gaps?: string[];
   breakdown?: { skills: number; experience: number; education: number };
+  scoreBreakdown?: { semantic: number; skills: number; sectionFit: number };
+  reason?: string;
+  flags?: string[];
+  status?: BackendAnalysisResult["status"];
 };
 
 export type ResumeFile = { id: string; name: string; size: number; file?: File };
@@ -28,7 +34,10 @@ export type Level = "great" | "good" | "low";
 export const levelOf = (score: number): Level => (score >= 85 ? "great" : score >= 70 ? "good" : "low");
 export const levelLabel: Record<Level, string> = { great: "Great match", good: "Good match", low: "Weak match" };
 export const initials = (name: string) => name.split(/\s+/).filter(Boolean).slice(0, 2).map((n) => n[0]).join("").toUpperCase();
-export const average = (cs: Candidate[]) => (cs.length ? Math.round(cs.reduce((s, c) => s + c.score, 0) / cs.length) : 0);
+export const average = (cs: Candidate[]) => {
+  const scored = cs.filter((c): c is Candidate & { score: number } => c.score !== null);
+  return scored.length ? Math.round(scored.reduce((sum, c) => sum + c.score, 0) / scored.length) : 0;
+};
 export const formatSize = (b: number) => (b < 1024 * 1024 ? `${Math.max(1, Math.round(b / 1024))} KB` : `${(b / 1024 / 1024).toFixed(1)} MB`);
 export const EMPLOYMENT = ["Full-time", "Part-time", "Contract", "Internship"] as const;
 
@@ -116,22 +125,44 @@ export function ScreeningProvider({ children }: { children: ReactNode }) {
     const id = activeJob && activeJob !== demoJob.id ? activeJob : crypto.randomUUID();
     const prev = jobs.find((j) => j.id === id)?.candidates ?? [];
     const results: Candidate[] = [];
-    for (let i = 0; i < files.length; i++) {
-      const f = files[i]!;
-      let text = "";
-      if (f.file) {
-        await putResume(f.id, f.file);
-        text = await extractPdfText(f.file);
-      } else {
-        const { getResume } = await import("./resume-store");
-        const blob = await getResume(f.id);
-        if (blob) text = await extractPdfText(blob);
+    if (import.meta.env["VITE_USE_MOCK"] === "true") {
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i]!;
+        let text = "";
+        if (f.file) {
+          await putResume(f.id, f.file);
+          text = await extractPdfText(f.file);
+        } else {
+          const blob = await getResume(f.id);
+          if (blob) text = await extractPdfText(blob);
+        }
+        const s = scoreResume(text, f.name, jd, weights);
+        results.push({ ...s, id: prev.find((c) => c.resumeId === f.id)?.id ?? f.id, resumeId: f.id });
+        onProgress(i + 1, files.length);
       }
-      const s = scoreResume(text, f.name, jd, weights);
-      results.push({ ...s, id: prev.find((c) => c.resumeId === f.id)?.id ?? f.id, resumeId: f.id });
-      onProgress(i + 1, files.length);
+    } else {
+      const uploads = await Promise.all(files.map(async (f) => {
+        if (f.file) {
+          await putResume(f.id, f.file);
+          return f.file;
+        }
+        const blob = await getResume(f.id);
+        if (!blob) throw new Error(`Resume file "${f.name}" is no longer available.`);
+        return new File([blob], f.name, { type: blob.type || "application/pdf" });
+      }));
+      const payload = await analyzeResumes(jd, uploads);
+      const analyses = getAnalysisResults(payload);
+      if (analyses.length !== files.length) {
+        throw new Error(`The backend returned ${analyses.length} results for ${files.length} resumes.`);
+      }
+      analyses.forEach((analysis, index) => {
+        const fileIndex = files.findIndex((f) => f.name === analysis.filename);
+        const file = files[fileIndex >= 0 ? fileIndex : index]!;
+        results.push(mapAnalysis(analysis, file.id, prev.find((c) => c.resumeId === file.id)?.id ?? file.id));
+      });
+      onProgress(files.length, files.length);
     }
-    results.sort((a, b) => b.score - a.score);
+    results.sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
     const job: Job = { id, title: title.trim() || "Untitled job", employment, jd, date: new Date().toISOString(), candidates: results, files: files.map(({ file: _f, ...f }) => f) };
     setJobs((p) => [job, ...p.filter((j) => j.id !== id)]);
     setActiveJob(id);
@@ -184,6 +215,70 @@ export function ScreeningProvider({ children }: { children: ReactNode }) {
       {children}
     </ScreeningContext.Provider>
   );
+}
+
+function getAnalysisResults(payload: unknown): BackendAnalysisResult[] {
+  const results = Array.isArray(payload)
+    ? payload
+    : typeof payload === "object" && payload !== null && "results" in payload
+      ? payload.results
+      : undefined;
+  if (!Array.isArray(results) || !results.every(isBackendAnalysisResult)) {
+    throw new Error("The backend returned an invalid analysis response.");
+  }
+  return results;
+}
+
+function isBackendAnalysisResult(value: unknown): value is BackendAnalysisResult {
+  if (typeof value !== "object" || value === null) return false;
+  const result = value as Record<string, unknown>;
+  const breakdown = result["score_breakdown"];
+  const isStringArray = (items: unknown) => Array.isArray(items) && items.every((item) => typeof item === "string");
+  return typeof result["filename"] === "string"
+    && typeof result["candidate_name"] === "string"
+    && typeof result["match_percentage"] === "number"
+    && isStringArray(result["top_skills"])
+    && isStringArray(result["missing_skills"])
+    && isStringArray(result["matched"])
+    && isStringArray(result["skills"])
+    && typeof breakdown === "object" && breakdown !== null
+    && "semantic" in breakdown && typeof breakdown["semantic"] === "number"
+    && "skills" in breakdown && typeof breakdown["skills"] === "number"
+    && "section_fit" in breakdown && typeof breakdown["section_fit"] === "number"
+    && typeof result["reason"] === "string"
+    && isStringArray(result["flags"])
+    && (result["status"] === "ok" || result["status"] === "needs_ocr" || result["status"] === "error")
+    && typeof result["role"] === "string"
+    && typeof result["experience"] === "string"
+    && isStringArray(result["strengths"])
+    && isStringArray(result["gaps"])
+    && typeof result["summary"] === "string";
+}
+
+function mapAnalysis(result: BackendAnalysisResult, resumeId: string, id: string): Candidate {
+  return {
+    id,
+    resumeId,
+    name: result.candidate_name || result.filename,
+    role: result.role,
+    score: result.status === "ok" ? result.match_percentage : null,
+    skills: result.skills,
+    topSkills: result.top_skills,
+    experience: result.experience,
+    summary: result.summary,
+    matched: result.matched,
+    missing: result.missing_skills,
+    strengths: result.strengths,
+    gaps: result.gaps,
+    scoreBreakdown: {
+      semantic: result.score_breakdown.semantic,
+      skills: result.score_breakdown.skills,
+      sectionFit: result.score_breakdown.section_fit,
+    },
+    reason: result.reason,
+    flags: result.flags,
+    status: result.status,
+  };
 }
 
 export function useScreening() {

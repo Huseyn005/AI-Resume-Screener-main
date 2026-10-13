@@ -34,6 +34,25 @@ export function CandidateTable({allJobs=false}: {allJobs?:boolean}) {
  </div>;
 }
 function Row({c,allJobs,onDetails}:{c:Candidate&{job:string};allJobs:boolean;onDetails:()=>void}){
- const {shortlist,toggleShortlist,rejected,reject}=useScreening();
- return <tr className="border-b last:border-0 hover:bg-muted/40"><td className="p-4"><div className="flex items-center gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-full bg-secondary text-xs font-bold text-secondary-foreground">{initials(c.name)}</span><div><p className="font-semibold capitalize">{c.name}</p><p className="text-xs text-muted-foreground">{c.role}</p></div></div></td>{allJobs&&<td className="p-4">{c.job}</td>}<td className="min-w-28 p-4">{c.score === null?<CandidateStatus candidate={c}/>:<><p className={cn("mb-2 font-semibold",c.score>=85?"text-success":c.score>=70?"text-foreground":"text-destructive")}>{c.score}%</p><Progress value={c.score} className="h-1"/></>}</td><td className="p-4"><div className="flex max-w-52 flex-wrap gap-1.5">{(c.topSkills ?? c.skills).slice(0,3).map(s=><span key={s} className="rounded-full bg-secondary px-2 py-1 text-xs text-secondary-foreground">{s}</span>)}</div></td><td className="p-4"><div className="flex gap-1"><Button variant="ghost" size="icon" title={shortlist.includes(c.id)?"Remove from shortlist":"Shortlist candidate"} aria-label={`Shortlist ${c.name}`} aria-pressed={shortlist.includes(c.id)} className={cn("rounded-full",shortlist.includes(c.id)&&"bg-accent text-accent-foreground")} onClick={()=>toggleShortlist(c.id)}><Star className={cn(shortlist.includes(c.id)&&"fill-current")}/></Button><Button variant="ghost" size="icon" title={rejected.includes(c.id)?"Restore candidate":"Reject candidate"} aria-label={`Reject ${c.name}`} aria-pressed={rejected.includes(c.id)} className={cn("rounded-full",rejected.includes(c.id)&&"bg-danger-soft text-destructive")} onClick={()=>reject(c.id)}><X/></Button></div></td><td className="p-4"><Button variant="link" onClick={onDetails}>View details</Button></td></tr>;
+ const {shortlist,toggleShortlist,rejected,reject,jobs,files}=useScreening();
+ const filename=[...files,...jobs.flatMap((j)=>j.files)].find((f)=>f.id===c.resumeId)?.name;
+ const subtitle=[c.role,c.experience].filter(Boolean).join(" · ");
+ return <tr className="border-b last:border-0 hover:bg-muted/40">
+  <td className="p-4"><div className="flex items-center gap-3">
+   <span className="grid size-10 shrink-0 place-items-center rounded-full bg-secondary text-xs font-bold text-secondary-foreground">{initials(c.name)}</span>
+   <div className="min-w-0">
+    <div className="flex flex-wrap items-center gap-2"><p className="font-semibold capitalize">{c.name}</p><CandidateStatus candidate={c} part="badges"/></div>
+    {filename&&<p title={filename} className="max-w-56 truncate text-xs text-muted-foreground">{filename}</p>}
+    {subtitle&&<p className="text-xs text-muted-foreground">{subtitle}</p>}
+   </div>
+  </div></td>
+  {allJobs&&<td className="p-4">{c.job}</td>}
+  <td className="min-w-28 p-4">{c.score===null?<CandidateStatus candidate={c} part="message"/>:<><p className={cn("mb-2 font-semibold",c.score>=85?"text-success":c.score>=70?"text-foreground":"text-destructive")}>{c.score}%</p><Progress value={c.score} className="h-1"/></>}</td>
+  <td className="p-4"><div className="flex max-w-52 flex-wrap gap-1.5">{(c.topSkills??c.skills).slice(0,3).map(s=><span key={s} className="rounded-full bg-secondary px-2 py-1 text-xs text-secondary-foreground">{s}</span>)}</div></td>
+  <td className="p-4"><div className="flex gap-1">
+   <Button variant="ghost" size="icon" title={shortlist.includes(c.id)?"Remove from shortlist":"Shortlist candidate"} aria-label={`Shortlist ${c.name}`} aria-pressed={shortlist.includes(c.id)} className={cn("rounded-full",shortlist.includes(c.id)&&"bg-accent text-accent-foreground")} onClick={()=>toggleShortlist(c.id)}><Star className={cn(shortlist.includes(c.id)&&"fill-current")}/></Button>
+   <Button variant="ghost" size="icon" title={rejected.includes(c.id)?"Restore candidate":"Reject candidate"} aria-label={`Reject ${c.name}`} aria-pressed={rejected.includes(c.id)} className={cn("rounded-full",rejected.includes(c.id)&&"bg-danger-soft text-destructive")} onClick={()=>reject(c.id)}><X/></Button>
+  </div></td>
+  <td className="p-4"><Button variant="link" onClick={onDetails}>View details</Button></td>
+ </tr>;
 }

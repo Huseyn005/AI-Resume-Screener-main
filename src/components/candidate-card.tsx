@@ -11,15 +11,18 @@ const tone = {
 };
 
 export function CandidateCard({ c, rank }: { c: Candidate; rank: number }) {
-  const { shortlist, toggleShortlist } = useScreening();
+  const { shortlist, toggleShortlist, jobs, files } = useScreening();
   const [open, setOpen] = useState(false);
   const t = tone[c.score === null ? "low" : levelOf(c.score)];
   const saved = shortlist.includes(c.id);
+  const filename = [...files, ...jobs.flatMap((j) => j.files)].find((f) => f.id === c.resumeId)?.name;
+  const subtitle = [c.role, c.experience].filter(Boolean).join(" · ");
+  const statusCard = c.status === "needs_ocr" || c.status === "error";
 
   return (
     <article className="rounded-2xl border bg-card p-4 shadow-soft transition-transform hover:-translate-y-0.5">
       <div className="flex items-center gap-4">
-        {c.score === null ? <CandidateStatus candidate={c} /> : (
+        {c.score !== null && (
           <div className={cn("relative grid size-14 shrink-0 place-items-center", t.ring)}>
             <svg viewBox="0 0 36 36" className="absolute inset-0 -rotate-90">
               <circle cx="18" cy="18" r="15.5" fill="none" stroke="currentColor" strokeOpacity=".15" strokeWidth="3" />
@@ -35,8 +38,10 @@ export function CandidateCard({ c, rank }: { c: Candidate; rank: number }) {
             <span className="text-xs font-semibold text-muted-foreground">#{rank}</span>
             <h3 className="truncate font-display text-lg font-semibold capitalize">{c.name}</h3>
             {c.score !== null && <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", t.chip)}>{levelLabel[levelOf(c.score)]}</span>}
+            <CandidateStatus candidate={c} part="badges" />
           </div>
-          <p className="text-sm text-muted-foreground">{c.role} · {c.experience}</p>
+          {filename && <p title={filename} className={cn("text-xs text-muted-foreground", statusCard ? "break-words [overflow-wrap:anywhere]" : "truncate")}>{filename}</p>}
+          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
         </button>
 
         <button
@@ -53,6 +58,8 @@ export function CandidateCard({ c, rank }: { c: Candidate; rank: number }) {
           <ChevronDown className={cn("size-5 transition-transform", open && "rotate-180")} />
         </button>
       </div>
+
+      {statusCard && <div className="mt-3"><CandidateStatus candidate={c} part="message" /></div>}
 
       {open && (
         <div className="mt-4 space-y-3 border-t pt-4 text-sm">

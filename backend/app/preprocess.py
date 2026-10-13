@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import date
 import re
 from collections.abc import Callable
 
@@ -37,14 +38,34 @@ HEADINGS = {
     ),
 }
 ROLE_RE = re.compile(
-    r"(designer|engineer|developer|manager|analyst|"
+    r"\b(?:designer|engineer|developer|manager|analyst|"
     r"scientist|lead|director|specialist|consultant|"
-    r"architect|marketer|recruiter|accountant)",
+    r"architect|marketer|recruiter|accountant|technician|"
+    r"operator|administrator|executive|officer|teacher|nurse|"
+    r"doctor|writer|editor|strategist|coordinator|trainer)\b",
     re.I,
 )
-YEARS_RE = re.compile(r"(\d{1,2})\s*\+?\s*(?:years|yrs)\b", re.I)
-
-
+DEGREE_RE = re.compile(
+    r"\b(?:bachelor|master|bsc|msc|university|college|degree|"
+    r"ph\.?d\.?|doctorate|diploma)\b",
+    re.I,
+)
+COMPANY_RE = re.compile(
+    r"\b(?:incorporated|inc\.?|llc|ltd\.?|limited|corp\.?|"
+    r"corporation|gmbh|company|co\.)\b",
+    re.I,
+)
+DATE_TOKEN = (
+    r"(?:(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|"
+    r"jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|"
+    r"oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+)?"
+    r"(?:19|20)\d{2}|(?:0?[1-9]|1[0-2])[/.-](?:19|20)\d{2}"
+)
+DATE_RANGE_RE = re.compile(
+    rf"(?P<start>{DATE_TOKEN})\s*(?:-|–|—|to)\s*"
+    rf"(?P<end>{DATE_TOKEN}|present|current|now)",
+    re.I,
+)
 def scrub_pii(text: str) -> str:
     text = EMAIL_RE.sub("[email]", text)
     text = URL_RE.sub("[url]", text)
@@ -166,16 +187,123 @@ def all_chunks(
 
 
 def guess_role(text: str) -> str:
-    for line in text.splitlines():
-        t = line.strip()
-        if t and len(t) < 60 and ROLE_RE.search(t):
-            return re.sub(r"\s+", " ", t)
-    return "Role not listed"
+    lines = text.splitlines()
+    in_experience = False
+    seen_heading = False
+    top_lines: list[str] = []
+    experience_lines: list[str] = []
+    for line in lines:
+        key = _heading_key(line)
+        if key:
+            seen_heading = True
+            in_experience = key == "experience"
+            continue
+        if in_experience:
+            experience_lines.append(line)
+        elif not seen_heading:
+            top_lines.append(line)
+    for line in top_lines[:12]:
+        title = _role_candidate(line)
+        if title:
+            return title
+    return _most_recent_role(experience_lines)
 
 
 def years_experience(text: str) -> str:
-    nums = [int(n) for n in YEARS_RE.findall(text)]
-    nums = [n for n in nums if n < 45]
-    if not nums:
-        return "Not stated"
-    return f"{max(nums)} years"
+    sections = split_sections(text)
+    ranges = _date_ranges(sections.get("experience", ""))
+    if not ranges:
+        return ""
+    ranges.sort()
+    merged: list[list[int]] = []
+    for start, end in ranges:
+        if merged and start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    months = sum(end - start for start, end in merged)
+    if months < 12:
+        return f"{max(months, 1)} months"
+    years, remainder = divmod(months, 12)
+    if not remainder:
+        return f"{years} year" if years == 1 else f"{years} years"
+    return f"{years} years {remainder} months"
+
+
+def _role_candidate(line: str) -> str:
+    parts = re.split(r"\s*[|•,]\s*|\s+at\s+", line.strip(), flags=re.I)
+    for part in parts:
+        title = re.sub(r"\s+", " ", part).strip(" ,:-")
+        if (
+            title
+            and len(title) < 60
+            and not DEGREE_RE.search(title)
+            and not COMPANY_RE.search(title)
+            and ROLE_RE.search(title)
+        ):
+            return title
+    return ""
+
+
+def _most_recent_role(lines: list[str]) -> str:
+    candidates: list[tuple[int, int, str]] = []
+    for index, line in enumerate(lines):
+        title = _role_candidate(line)
+        if not title:
+            continue
+        nearby = range(max(0, index - 2), min(len(lines), index + 5))
+        dates = [
+            (abs(date_index - index), _date_range(match)[1])
+            for date_index in nearby
+            for match in DATE_RANGE_RE.finditer(lines[date_index])
+        ]
+        nearest = min((distance for distance, _ in dates), default=None)
+        end = max(
+            (date_end for distance, date_end in dates if distance == nearest),
+            default=-1,
+        )
+        candidates.append((end, -index, title))
+    if not candidates:
+        return ""
+    return max(candidates)[2]
+
+
+def _date_ranges(text: str) -> list[tuple[int, int]]:
+    return [
+        _date_range(match)
+        for match in DATE_RANGE_RE.finditer(text)
+    ]
+
+
+def _date_range(match: re.Match[str]) -> tuple[int, int]:
+    start = _date_index(match.group("start"))
+    end_text = match.group("end")
+    if end_text.casefold() in {"present", "current", "now"}:
+        today = date.today()
+        end = today.year * 12 + today.month - 1
+    else:
+        end = _date_index(end_text)
+    return start, max(start + 1, end)
+
+
+def _date_index(value: str) -> int:
+    value = value.strip()
+    month_match = re.match(r"([A-Za-z]+)\s+(\d{4})", value)
+    numeric_match = re.match(r"(\d{1,2})[/.-](\d{4})", value)
+    if month_match:
+        month_name, year_text = month_match.groups()
+        month_names = (
+            "jan", "feb", "mar", "apr", "may", "jun",
+            "jul", "aug", "sep", "oct", "nov", "dec",
+        )
+        month = next(
+            i for i, name in enumerate(month_names, 1)
+            if month_name.casefold().startswith(name)
+        )
+        year = int(year_text)
+    elif numeric_match:
+        month, year = map(int, numeric_match.groups())
+    else:
+        year = int(value)
+        month = 1
+    return year * 12 + month - 1

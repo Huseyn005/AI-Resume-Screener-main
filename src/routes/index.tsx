@@ -52,19 +52,19 @@ function ScreenPage() {
   async function run() {
     setBusy(true); setProgress(0);
     try {
-      await runScreening((d, t) => setProgress(Math.round((d / t) * 100)));
-      toast.success("Done! Here are your best matches.");
+      const results = await runScreening((d, t) => setProgress(Math.round((d / t) * 100)));
+      toast.success(`${results.length} resumes analyzed successfully.`);
       setTimeout(() => document.getElementById("results")?.scrollIntoView({ behavior: "smooth" }), 50);
-    } catch {
-      toast.error("Something went wrong while checking resumes.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Something went wrong while checking resumes.");
     } finally {
       setBusy(false);
     }
   }
 
   const ready = jd.trim().length > 20 && files.length > 0;
-  const shown = candidates.filter((c) => filter === "all" || levelOf(c.score) === filter);
-  const top = candidates[0];
+  const shown = candidates.filter((c) => c.score === null ? filter === "all" : filter === "all" || levelOf(c.score) === filter);
+  const top = candidates.find((c) => c.score !== null);
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 px-4 py-10">
@@ -143,7 +143,7 @@ function ScreenPage() {
           <div className="grid grid-cols-3 gap-3">
             {[
               { label: "Resumes scanned", value: String(candidates.length) },
-              { label: "Average match", value: `${average(candidates)}%` },
+              { label: "Average match", value: candidates.some((c) => c.score !== null) ? `${average(candidates)}%` : "—" },
               { label: "Top candidate", value: top?.name ?? "—" },
             ].map((s) => (
               <div key={s.label} className="rounded-2xl border bg-card p-4">

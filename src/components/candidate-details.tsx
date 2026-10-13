@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/
 import { Progress } from "@/components/ui/progress";
 import { getResume } from "@/lib/resume-store";
 import { useScreening, type Candidate } from "@/lib/screening";
+import { CandidateStatus } from "@/components/candidate-status";
 
 function Chips({ items, empty, muted }: { items: string[]; empty: string; muted?: boolean }) {
   if (!items.length) return <p className="text-sm text-muted-foreground">{empty}</p>;
@@ -40,7 +41,8 @@ export function CandidateDetails({ candidate, onClose }: { candidate: Candidate 
     return () => { alive = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };
   }, [resumeId, files]);
 
-  const b = candidate?.breakdown;
+  const b = candidate?.scoreBreakdown;
+  const legacyBreakdown = candidate?.breakdown;
   return (
     <Sheet open={Boolean(candidate)} onOpenChange={(open) => { if (!open) onClose(); }}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
@@ -50,11 +52,15 @@ export function CandidateDetails({ candidate, onClose }: { candidate: Candidate 
               <SheetTitle className="font-display text-2xl capitalize">{candidate.name}</SheetTitle>
               <SheetDescription>{candidate.role}{job ? ` · ${job.title}` : ""}</SheetDescription>
             </div>
-            <div>
-              <p className="font-display text-6xl font-bold text-primary">{candidate.score}%</p>
-              <p className="mt-1 text-sm text-muted-foreground">Match score{job?.demo ? " · demo data" : ""}</p>
-            </div>
+            <CandidateStatus candidate={candidate} />
+            {candidate.score !== null && (
+              <div>
+                <p className="font-display text-6xl font-bold text-primary">{candidate.score}%</p>
+                <p className="mt-1 text-sm text-muted-foreground">Match score{job?.demo ? " · demo data" : ""}</p>
+              </div>
+            )}
             <section><h3 className="mb-2 font-semibold">Summary</h3><p className="text-sm text-muted-foreground">{candidate.summary}</p></section>
+            {candidate.reason && <section><h3 className="mb-2 font-semibold">Reason</h3><p className="text-sm text-muted-foreground">{candidate.reason}</p></section>}
             <div className="grid gap-6 sm:grid-cols-2">
               <section><h3 className="mb-2 font-semibold">Strengths</h3>
                 <ul className="space-y-1 text-sm text-muted-foreground">{(candidate.strengths?.length ? candidate.strengths : ["None found"]).map((s) => <li key={s}>{s}</li>)}</ul></section>
@@ -63,9 +69,19 @@ export function CandidateDetails({ candidate, onClose }: { candidate: Candidate 
             </div>
             <section><h3 className="mb-2 font-semibold">Matched skills</h3><Chips items={candidate.matched ?? candidate.skills} empty="No required skills matched" /></section>
             <section><h3 className="mb-2 font-semibold">Missing skills</h3><Chips items={candidate.missing ?? []} empty="Nothing missing" muted /></section>
-            {b && (
+            {candidate.score !== null && b && (
               <section className="space-y-3"><h3 className="font-semibold">Score breakdown</h3>
-                {([["Skills", b.skills], ["Experience", b.experience], ["Education", b.education]] as const).map(([label, v]) => (
+                {([["Semantic", b.semantic], ["Skills", b.skills], ["Section fit", b.sectionFit]] as const).map(([label, v]) => (
+                  <div key={label}>
+                    <div className="mb-1 flex justify-between text-sm"><span>{label}</span><span className="text-muted-foreground">{v}%</span></div>
+                    <Progress value={v} className="h-1.5" />
+                  </div>
+                ))}
+              </section>
+            )}
+            {candidate.score !== null && !b && legacyBreakdown && (
+              <section className="space-y-3"><h3 className="font-semibold">Score breakdown</h3>
+                {([["Skills", legacyBreakdown.skills], ["Experience", legacyBreakdown.experience], ["Education", legacyBreakdown.education]] as const).map(([label, v]) => (
                   <div key={label}>
                     <div className="mb-1 flex justify-between text-sm"><span>{label}</span><span className="text-muted-foreground">{v}%</span></div>
                     <Progress value={v} className="h-1.5" />

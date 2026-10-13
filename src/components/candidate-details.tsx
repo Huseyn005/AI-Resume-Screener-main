@@ -25,6 +25,7 @@ export function CandidateDetails({ candidate, onClose }: { candidate: Candidate 
   const job = jobs.find((j) => j.candidates.some((c) => c.id === candidate?.id));
   const resumeId = candidate?.resumeId;
   const resume = [...files, ...jobs.flatMap((j) => j.files)].find((f) => f.id === resumeId);
+  const subtitle = [candidate?.role, candidate?.experience, job?.title].filter(Boolean).join(" · ");
 
   useEffect(() => {
     setUrl(undefined);
@@ -49,10 +50,14 @@ export function CandidateDetails({ candidate, onClose }: { candidate: Candidate 
         {candidate && (
           <div className="space-y-7 pb-8">
             <div className="pr-8">
-              <SheetTitle className="font-display text-2xl capitalize">{candidate.name}</SheetTitle>
-              <SheetDescription>{candidate.role}{job ? ` · ${job.title}` : ""}</SheetDescription>
+              <div className="flex flex-wrap items-center gap-2">
+                <SheetTitle className="font-display text-2xl capitalize">{candidate.name}</SheetTitle>
+                <CandidateStatus candidate={candidate} part="badges" />
+              </div>
+              {resume?.name && <p title={resume.name} className="mt-1 truncate text-xs text-muted-foreground">{resume.name}</p>}
+              {subtitle && <SheetDescription>{subtitle}</SheetDescription>}
             </div>
-            <CandidateStatus candidate={candidate} />
+            <CandidateStatus candidate={candidate} part="message" />
             {candidate.score !== null && (
               <div>
                 <p className="font-display text-6xl font-bold text-primary">{candidate.score}%</p>
@@ -60,7 +65,7 @@ export function CandidateDetails({ candidate, onClose }: { candidate: Candidate 
               </div>
             )}
             <section><h3 className="mb-2 font-semibold">Summary</h3><p className="text-sm text-muted-foreground">{candidate.summary}</p></section>
-            {candidate.reason && <section><h3 className="mb-2 font-semibold">Reason</h3><p className="text-sm text-muted-foreground">{candidate.reason}</p></section>}
+            {candidate.reason && candidate.status !== "needs_ocr" && candidate.status !== "error" && <section><h3 className="mb-2 font-semibold">Reason</h3><p className="text-sm text-muted-foreground">{candidate.reason}</p></section>}
             <div className="grid gap-6 sm:grid-cols-2">
               <section><h3 className="mb-2 font-semibold">Strengths</h3>
                 <ul className="space-y-1 text-sm text-muted-foreground">{(candidate.strengths?.length ? candidate.strengths : ["None found"]).map((s) => <li key={s}>{s}</li>)}</ul></section>

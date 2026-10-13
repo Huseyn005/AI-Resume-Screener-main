@@ -52,7 +52,7 @@ function JobsPage() {
               </div>
               <div className="mt-6 flex gap-8 text-sm">
                 <span><strong className="font-display text-xl">{j.candidates.length}</strong> <span className="text-muted-foreground">screened</span></span>
-                <span><strong className="font-display text-xl">{average(j.candidates)}%</strong> <span className="text-muted-foreground">average match</span></span>
+                <span><strong className="font-display text-xl">{j.candidates.some((c) => c.score !== null) ? `${average(j.candidates)}%` : "—"}</strong> <span className="text-muted-foreground">average match</span></span>
               </div>
               {j.demo && <p className="mt-4 text-xs text-muted-foreground">Demo data</p>}
             </article>

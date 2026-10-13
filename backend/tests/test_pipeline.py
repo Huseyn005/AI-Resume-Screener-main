@@ -11,7 +11,11 @@ from fastapi.testclient import TestClient
 from app import main
 from app.explain import build_reason
 from app.extract import extract_pdf
-from app.preprocess import chunk_text
+from app.preprocess import (
+    chunk_text,
+    guess_role,
+    years_experience,
+)
 from app.skills import extract_lexical, load_skills
 
 JOB_DESCRIPTION = (
@@ -121,6 +125,60 @@ def test_skill_catalog_excludes_known_false_entries() -> None:
     assert "ranking" not in catalog
     assert "playwright python" not in catalog
     assert "advanced python scheduler" not in catalog
+
+
+def test_numeric_only_entries_are_not_skills() -> None:
+    lexicon = load_skills()
+    assert "01" not in lexicon.canonical
+    assert "1176" not in lexicon.canonical
+    assert extract_lexical("01", lexicon) == []
+
+
+@pytest.mark.parametrize(
+    "resume_skill",
+    ["programmable logic controllers", "PLCs", "PLC-based"],
+)
+def test_plc_aliases_match_jd_skill(resume_skill: str) -> None:
+    lexicon = load_skills()
+    assert extract_lexical(resume_skill, lexicon) == ["plc"]
+    assert extract_lexical("plc", lexicon) == ["plc"]
+
+
+def test_single_letter_skills_require_context() -> None:
+    lexicon = load_skills()
+    assert "c" not in extract_lexical("Used c at work", lexicon)
+    assert "r" not in extract_lexical("Used r at work", lexicon)
+    assert extract_lexical("Skills\nC\nExperience", lexicon) == ["c"]
+    assert extract_lexical("C programming", lexicon) == ["c"]
+    assert extract_lexical("R language", lexicon) == ["r"]
+
+
+def test_degree_line_is_not_extracted_as_role() -> None:
+    assert guess_role(
+        "Bachelor of Engineering\nEducation\nUniversity of Example"
+    ) == ""
+
+
+def test_company_name_is_not_part_of_role() -> None:
+    assert guess_role(
+        "Jane Doe\nSenior Software Engineer at Acme Inc.\nExperience"
+    ) == "Senior Software Engineer"
+
+
+def test_role_and_experience_come_from_work_history() -> None:
+    resume = (
+        "Jane Doe\nBachelor of Engineering\nExperience\n"
+        "Senior Software Engineer\n2022 - 2024\n"
+        "Junior Developer\n2019 - 2022"
+    )
+    assert guess_role(resume) == "Senior Software Engineer"
+    assert years_experience(resume) == "5 years"
+
+
+def test_experience_is_empty_without_date_ranges() -> None:
+    assert years_experience(
+        "Experience\nSoftware Engineer\nWorked for 5 years"
+    ) == ""
 
 
 def test_top_skills_follow_jd_appearance(client: TestClient) -> None:

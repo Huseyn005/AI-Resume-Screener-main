@@ -35,3 +35,5 @@ backend/venv/
 __pycache__/
 backend/samples/
 .env
+
+.pytest_cache/

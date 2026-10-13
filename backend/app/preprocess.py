@@ -1,5 +1,6 @@
 from __future__ import annotations
 import re
+from collections.abc import Callable
 
 EMAIL_RE = re.compile(r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b", re.I)
 URL_RE = re.compile(
@@ -84,21 +85,60 @@ def chunk_text(
         text: str,
         size: int = 200,
         overlap: int = 40,
+        token_counter: Callable[[str], int] | None = None,
 ) -> list[str]:
     tokens = text.split()
     if not tokens:
         return []
     size = max(1, size)
     overlap = min(max(0, overlap), size - 1)
-    step = max(1, size - overlap)
     chunks: list[str] = []
     i = 0
     while i < len(tokens):
-        piece = tokens[i:i + size]
-        chunks.append(" ".join(piece))
-        if i + size >= len(tokens):
+        end = min(i + size, len(tokens))
+        if token_counter:
+            while (
+                end > i
+                and token_counter(" ".join(tokens[i:end])) > size
+            ):
+                end -= 1
+        if end == i:
+            if not token_counter:
+                end = i + 1
+            else:
+                chunks.extend(
+                    _split_long_token(tokens[i], size, token_counter)
+                )
+                i += 1
+                continue
+        chunks.append(" ".join(tokens[i:end]))
+        if end == len(tokens):
             break
-        i += step
+        i = max(i + 1, end - overlap)
+    return chunks
+
+
+def _split_long_token(
+        token: str,
+        size: int,
+        token_counter: Callable[[str], int],
+) -> list[str]:
+    chunks: list[str] = []
+    start = 0
+    while start < len(token):
+        low, high = start + 1, len(token)
+        end = start
+        while low <= high:
+            mid = (low + high) // 2
+            if token_counter(token[start:mid]) <= size:
+                end = mid
+                low = mid + 1
+            else:
+                high = mid - 1
+        if end == start:
+            raise ValueError("A single character exceeds the token limit")
+        chunks.append(token[start:end])
+        start = end
     return chunks
 
 
@@ -106,6 +146,7 @@ def all_chunks(
         sections: dict[str, str],
         size: int = 200,
         overlap: int = 40,
+        token_counter: Callable[[str], int] | None = None,
 ) -> list[tuple[str, str]]:
     out: list[tuple[str, str]] = []
     order = (
@@ -115,11 +156,11 @@ def all_chunks(
         body = sections.get(name) or ""
         if not body:
             continue
-        for chunk in chunk_text(body, size, overlap):
+        for chunk in chunk_text(body, size, overlap, token_counter):
             out.append((name, chunk))
     if not out:
         joined = " ".join(sections.values())
-        for chunk in chunk_text(joined, size, overlap):
+        for chunk in chunk_text(joined, size, overlap, token_counter):
             out.append(("other", chunk))
     return out
 

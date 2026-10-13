@@ -1,7 +1,8 @@
 from __future__ import annotations
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, File, Form, UploadFile
+from pathlib import Path
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import numpy as np
@@ -22,7 +23,12 @@ from app.preprocess import (
     split_sections,
     years_experience,
 )
-from app.schemas import AnalyzeResponse, AnalyzeResult, HealthResponse, ScoreBreakdown
+from app.schemas import (
+    AnalyzeResponse,
+    AnalyzeResult,
+    HealthResponse,
+    ScoreBreakdown,
+)
 from app.scoring import combine, section_fit_score, skill_coverage, topk_mean
 from app.skills import (
     extract_lexical,
@@ -101,6 +107,14 @@ async def analyze(
 
 async def _analyze_one(upload: UploadFile, jd: str) -> AnalyzeResult:
     filename = upload.filename or "resume.pdf"
+    content_type = (upload.content_type or "").split(";")[0].strip().lower()
+    if (
+        Path(filename).suffix.lower() != ".pdf"
+        or (content_type and content_type not in ALLOWED_TYPES)
+    ):
+        raise HTTPException(
+            status_code=415, detail="Only PDF resumes are supported"
+        )
     settings: Settings = app.state.settings
     try:
         data = await upload.read()
@@ -156,14 +170,26 @@ async def _score_text(
 ) -> AnalyzeResult:
     model = app.state.model
     lexicon = app.state.lexicon
+    model_limit = getattr(model, "max_seq_length", None)
+    if model_limit is None:
+        model_limit = settings.chunk_tokens
+    chunk_size = max(
+        1, min(settings.chunk_tokens, int(model_limit))
+    )
+    tokenizer = getattr(model, "tokenizer", None)
+    token_counter = None
+    if tokenizer is not None:
+        def token_counter(chunk: str) -> int:
+            return len(tokenizer.encode(chunk, add_special_tokens=True))
+
     text = scrub_pii(raw_text)
     jd_clean = scrub_pii(jd)
     sections = split_sections(text)
     chunks = all_chunks(
-        sections, settings.chunk_tokens, settings.chunk_overlap
+        sections, chunk_size, settings.chunk_overlap, token_counter
     )
     jd_chunks = chunk_text(
-        jd_clean, settings.chunk_tokens, settings.chunk_overlap
+        jd_clean, chunk_size, settings.chunk_overlap, token_counter
     )
     if not jd_chunks:
         jd_chunks = [jd_clean] if jd_clean else []
@@ -179,7 +205,7 @@ async def _score_text(
         ) if p
     )
     exp_chunks = chunk_text(
-        exp_proj, settings.chunk_tokens, settings.chunk_overlap
+        exp_proj, chunk_size, settings.chunk_overlap, token_counter
     ) if exp_proj else []
     resume_texts = [c[1] for c in chunks]
     batch = jd_chunks + resume_texts + exp_chunks + jd_skills + phrases
@@ -211,7 +237,9 @@ async def _score_text(
     for skill, _score in sem_hits:
         if skill not in matched:
             matched.append(skill)
-    missing = [s for s in jd_skills if s not in set(matched)]
+    matched_set = set(matched)
+    matched = [skill for skill in jd_skills if skill in matched_set]
+    missing = [s for s in jd_skills if s not in matched_set]
     skill_scores = {s: 1.0 for s in lexical}
     for skill, score in sem_hits:
         skill_scores[skill] = max(skill_scores.get(skill, 0.0), score)
@@ -251,11 +279,9 @@ async def _score_text(
         experience=years_experience(raw_text),
         skills=resume_skills,
         matched=matched,
-        missing=missing,
         strengths=strengths,
         gaps=gaps,
         summary=reason,
-        breakdown=breakdown,
     )
 
 
@@ -291,6 +317,5 @@ def _stub(
         flags=flags,
         status=status,
         summary=text,
-        breakdown=zero,
         gaps=["Text could not be read from this PDF"],
     )

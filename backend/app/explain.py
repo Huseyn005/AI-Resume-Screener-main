@@ -8,7 +8,7 @@ TEMPLATES_NO_MATCH = (
     "This resume has limited overlap with the listed job skills "
     "in the {section} section."
 )
-TEMPLATES_GAPS = "Key gaps include {missing}."
+TEMPLATES_GAPS = "Key gaps include: {missing}."
 TEMPLATES_COVERED = "Required skills appear well covered overall."
 
 
@@ -34,14 +34,21 @@ def build_reason(
         missing: list[str],
         best_section: str,
 ) -> str:
-    section = best_section or "experience"
     if matched:
         skills = ", ".join(matched[:3])
-        first = TEMPLATES_MATCH.format(
-            section=section, skills=skills
-        )
+        if best_section and best_section != "other":
+            first = TEMPLATES_MATCH.format(
+                section=best_section, skills=skills
+            )
+        else:
+            first = f"This resume covers {skills}."
     else:
-        first = TEMPLATES_NO_MATCH.format(section=section)
+        if best_section and best_section != "other":
+            first = TEMPLATES_NO_MATCH.format(section=best_section)
+        else:
+            first = (
+                "This resume has limited overlap with the listed job skills."
+            )
     if missing:
         second = TEMPLATES_GAPS.format(
             missing=", ".join(missing[:3])

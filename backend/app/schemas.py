@@ -13,19 +13,17 @@ class AnalyzeResult(BaseModel):
     match_percentage: int
     top_skills: list[str]
     missing_skills: list[str]
+    matched: list[str] = Field(default_factory=list)
+    skills: list[str] = Field(default_factory=list)
     score_breakdown: ScoreBreakdown
     reason: str
     flags: list[str]
     status: str
     role: str = ""
     experience: str = ""
-    skills: list[str] = Field(default_factory=list)
-    matched: list[str] = Field(default_factory=list)
-    missing: list[str] = Field(default_factory=list)
     strengths: list[str] = Field(default_factory=list)
     gaps: list[str] = Field(default_factory=list)
     summary: str = ""
-    breakdown: ScoreBreakdown | None = None
 
 
 class AnalyzeResponse(BaseModel):

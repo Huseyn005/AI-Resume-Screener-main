@@ -1,6 +1,6 @@
 from __future__ import annotations
+import asyncio
 from typing import Any
-import anyio
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from app.config import Settings
@@ -31,7 +31,7 @@ def encode_sync(model: Any, texts: list[str]) -> np.ndarray:
 
 
 async def encode_texts(model: Any, texts: list[str]) -> np.ndarray:
-    return await anyio.to_thread.run_sync(encode_sync, model, texts)
+    return await asyncio.to_thread(encode_sync, model, texts)
 
 
 def mean_pool(vectors: np.ndarray) -> np.ndarray:

@@ -2,7 +2,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-import fitz
+import pymupdf
 
 PDF_MAGIC = b"%PDF"
 NAME_RE = re.compile(
@@ -54,7 +54,7 @@ def extract_pdf(
             candidate_name=fallback, heading="",
         )
     try:
-        doc = fitz.open(stream=data, filetype="pdf")
+        doc = pymupdf.open(stream=data, filetype="pdf")
     except Exception:
         return Extracted(
             text="", flags=["invalid_pdf"], status="error",

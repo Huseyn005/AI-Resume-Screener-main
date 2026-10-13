@@ -34,6 +34,8 @@ def load_skills(path: Path | None = None) -> SkillLexicon:
             continue
         canon = parts[0]
         for alias in parts:
+            if canon in STOP or alias in STOP:
+                continue
             canonical[alias] = canon
             canonical[alias.replace(" ", "")] = canon
     patterns: list[tuple[str, re.Pattern[str]]] = []
@@ -51,20 +53,31 @@ def load_skills(path: Path | None = None) -> SkillLexicon:
 
 
 def extract_lexical(text: str, lexicon: SkillLexicon) -> list[str]:
+    hits: list[tuple[int, int, int, str]] = []
+    for order, (canon, pat) in enumerate(lexicon.patterns):
+        if canon in STOP:
+            continue
+        for match in pat.finditer(text):
+            hits.append(
+                (match.start(), -len(match.group()), order, canon)
+            )
+    hits.sort()
     found: list[str] = []
     seen: set[str] = set()
-    blob = text.lower()
-    for canon, pat in lexicon.patterns:
+    for _start, _length, _order, canon in hits:
         if canon in seen:
             continue
-        if pat.search(blob):
-            seen.add(canon)
-            found.append(canon)
+        seen.add(canon)
+        found.append(canon)
     return found
 
 
 def noun_phrases(text: str) -> list[str]:
-    tokens = re.findall(r"[A-Za-z][A-Za-z0-9+#.]{1,}", text)
+    tokens = [
+        token for token in
+        re.findall(r"[A-Za-z][A-Za-z0-9+#.]{1,}", text)
+        if len(token) >= 2
+    ]
     phrases: list[str] = []
     seen: set[str] = set()
     i = 0
@@ -78,7 +91,7 @@ def noun_phrases(text: str) -> list[str]:
         while j < n and j < i + 3 and tokens[j].lower() not in STOP:
             buf.append(tokens[j])
             phrase = " ".join(buf).lower()
-            if phrase not in seen and len(phrase) > 1:
+            if phrase not in seen and len(phrase) >= 2:
                 seen.add(phrase)
                 phrases.append(phrase)
             j += 1

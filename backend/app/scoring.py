@@ -1,6 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass
+import joblib
 import numpy as np
+from sklearn.isotonic import IsotonicRegression
 from app.config import Settings
 
 
@@ -33,6 +35,24 @@ def calibrate(raw: float, low: float, high: float) -> float:
     return float(np.clip((raw - low) / (high - low), 0.0, 1.0))
 
 
+def load_calibrator(settings: Settings) -> IsotonicRegression | None:
+    path = settings.calibrator_path()
+    if not path.is_file():
+        return None
+    return joblib.load(path)
+
+
+def semantic_probability(
+        raw: float,
+        settings: Settings,
+        calibrator: IsotonicRegression | None,
+) -> float:
+    if calibrator is None:
+        return calibrate(raw, settings.semantic_low, settings.semantic_high)
+    predicted = calibrator.predict(np.asarray([[raw]], dtype=np.float64))
+    return float(np.clip(predicted[0], 0.0, 1.0))
+
+
 def skill_coverage(matched: int, total: int) -> float:
     if total <= 0:
         return 0.0
@@ -47,10 +67,9 @@ def section_fit_score(jd_vec: np.ndarray,
 
 
 def combine(semantic: float, skills: float, section: float,
-            settings: Settings) -> ScoreParts:
-    calibrated = calibrate(
-        semantic, settings.semantic_low, settings.semantic_high
-    )
+            settings: Settings,
+            calibrator: IsotonicRegression | None = None) -> ScoreParts:
+    calibrated = semantic_probability(semantic, settings, calibrator)
     final = (
         settings.semantic_weight * calibrated
         + settings.skill_weight * skills

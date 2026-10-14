@@ -9,6 +9,7 @@ install the pinned dependencies, and copy the environment template:
 cd backend
 python -m venv venv
 .\venv\Scripts\Activate.ps1
+python -m pip install -r requirements-ml.txt
 python -m pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
@@ -23,9 +24,10 @@ Start the API from `backend/`:
 uvicorn app.main:app --port 8000
 ```
 
-The API exposes `GET /health` and `POST /analyze`. The analyze endpoint accepts
-a `job_description` form field and one or more PDF files in the `resumes` form
-field. Job descriptions must contain 50-10,000 characters.
+The API exposes `GET /health` and `POST /analyze`. Health reports the loaded
+model and whether the semantic calibrator is loaded. The analyze endpoint
+accepts a `job_description` form field and one or more PDF files in the
+`resumes` form field. Job descriptions must contain 50-10,000 characters.
 
 ## Analyze result schema
 
@@ -59,3 +61,24 @@ Run the backend tests from this directory:
 ```powershell
 python -m pytest
 ```
+
+## ML data, training, and evaluation
+
+Place the public Kaggle Resume Dataset at `ml/data/Resume.csv`. The source CSV,
+generated split data, and trained models are ignored by git. From `backend/`,
+run the pipeline in this order:
+
+```powershell
+python -m ml.prepare_data
+python -m ml.train --max-pairs 200 --epochs 1
+python -m ml.train --epochs 2 --batch-size 16 --lr 2e-5 --max-pairs 3000
+python -m ml.evaluate
+python -m ml.calibrate
+python -m pytest
+```
+
+The first training command is a fast smoke test; the second performs the
+configured training run. Evaluation writes `ml/results.json`,
+`ml/REPORT.md`, and `ml/score_distribution.png`. Training and calibration
+write `models/finetuned/` and `models/calibrator.pkl`, which the API loads
+automatically when present.

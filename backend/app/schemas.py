@@ -33,3 +33,4 @@ class AnalyzeResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     model: str
+    calibrator_loaded: bool

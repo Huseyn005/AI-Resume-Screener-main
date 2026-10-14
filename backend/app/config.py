@@ -17,9 +17,9 @@ class Settings(BaseSettings):
     allowed_origins: str = (
         "http://localhost:5173,http://localhost:8080"
     )
-    semantic_weight: float = 0.45
-    skill_weight: float = 0.40
-    section_weight: float = 0.15
+    semantic_weight: float = 0.7
+    skill_weight: float = 0.20
+    section_weight: float = 0.10
     semantic_low: float = 0.20
     semantic_high: float = 0.75
     skill_cosine_threshold: float = 0.72

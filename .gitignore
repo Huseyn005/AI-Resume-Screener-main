@@ -37,3 +37,5 @@ backend/samples/
 .env
 
 .pytest_cache/
+backend/models/
+backend/ml/data/

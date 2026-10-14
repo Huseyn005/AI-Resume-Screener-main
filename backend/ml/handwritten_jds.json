@@ -1,0 +1,34 @@
+[
+  {
+    "category": "INFORMATION-TECHNOLOGY",
+    "text": "A mid-sized health services company is looking for an infrastructure engineer to keep its internal platforms dependable as the business grows. You will maintain Linux and Windows systems, improve cloud deployment practices, investigate production incidents, and document solutions for the support team. The role partners with security and application groups on access controls, backups, network reliability, and release planning. We value practical experience with cloud platforms, scripting, monitoring, and service management, along with a calm approach to troubleshooting."
+  },
+  {
+    "category": "ACCOUNTANT",
+    "text": "We need an accounting professional to join the finance team during a period of expansion. This person will own month-end close activities, reconcile balance sheet accounts, review expense submissions, and prepare schedules for external auditors. The position also supports cash-flow reporting and helps managers understand budget variances. Applicants should be comfortable working in an ERP environment, handling sensitive financial information, and improving controls without slowing routine operations. A recognized accounting qualification and clear written communication are important."
+  },
+  {
+    "category": "ADVOCATE",
+    "text": "The legal aid office seeks a client-focused advocate for its community advice service. You will conduct initial interviews, explain available options in plain language, prepare case notes, and refer clients to specialist counsel where appropriate. Matters may involve housing, employment, or access to public services. The successful candidate will manage a changing caseload, maintain confidentiality, and work constructively with partner organizations. We welcome applicants who can combine careful research with empathy and who are committed to fair access to legal support."
+  },
+  {
+    "category": "AGRICULTURE",
+    "text": "Our regional crop operation is adding an agronomy field specialist to help growers improve yields while protecting soil and water resources. The work includes field visits, crop-health assessments, pest monitoring, and practical recommendations based on seasonal conditions. You will keep accurate trial records and coordinate with farm managers, suppliers, and extension partners. Experience with crop production and safe equipment use is useful; familiarity with irrigation planning or precision-agriculture tools is an advantage. This is a hands-on role with regular travel between farms."
+  },
+  {
+    "category": "APPAREL",
+    "text": "A contemporary apparel label is hiring a product development coordinator to move seasonal collections from initial concept into production. You will maintain sample and specification records, follow up with factories, track material approvals, and flag schedule or quality risks early. The coordinator works closely with design, merchandising, and sourcing, translating creative direction into clear production details. Strong organization and attention to fabric, fit, and finishing are essential. Candidates with experience in apparel manufacturing or vendor coordination will be well placed to contribute."
+  },
+  {
+    "category": "AVIATION",
+    "text": "A maintenance organization supporting a mixed commercial fleet is seeking an aviation maintenance planner. The planner will coordinate scheduled inspections, confirm parts and labor availability, update maintenance records, and communicate aircraft status to operations. Safety and regulatory compliance guide every decision. You should be comfortable interpreting technical documentation, prioritizing work with multiple stakeholders, and escalating discrepancies rather than allowing them to go unresolved. Experience in an approved maintenance environment and familiarity with digital tracking systems are preferred."
+  },
+  {
+    "category": "BUSINESS-DEVELOPMENT",
+    "text": "We are expanding our partnerships team and want a business development manager who can build durable relationships rather than chase short-term volume. You will research prospective accounts, qualify opportunities, develop proposals with delivery colleagues, and keep an accurate pipeline forecast. The role includes discovery meetings with senior stakeholders and thoughtful follow-up through a longer sales cycle. We are interested in people who can explain a complex service clearly, negotiate collaboratively, and turn customer feedback into useful direction for the product and leadership teams."
+  },
+  {
+    "category": "CHEF",
+    "text": "A busy neighborhood restaurant is looking for a chef de partie to take ownership of one station and help the kitchen deliver consistent service. Responsibilities include preparing ingredients, maintaining clean and safe work areas, following recipes, and communicating timing with the wider brigade. You will contribute ideas for seasonal menus and help control waste and stock rotation. We need someone who stays composed during a full service, respects food-safety standards, and takes pride in coaching junior colleagues. Evening and weekend availability is required."
+  }
+]

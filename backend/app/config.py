@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 FINETUNED_DIR = BACKEND_ROOT / "models" / "finetuned"
+CALIBRATOR_PATH = BACKEND_ROOT / "models" / "calibrator.pkl"
 
 
 class Settings(BaseSettings):
@@ -36,6 +37,9 @@ class Settings(BaseSettings):
         if FINETUNED_DIR.is_dir() and any(FINETUNED_DIR.iterdir()):
             return str(FINETUNED_DIR)
         return self.embed_model
+
+    def calibrator_path(self) -> Path:
+        return CALIBRATOR_PATH
 
 
 @lru_cache

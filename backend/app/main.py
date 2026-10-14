@@ -6,8 +6,8 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import numpy as np
-from app.config import Settings, get_settings
-from app.embed import encode_texts, load_model, mean_pool
+from app.config import FINETUNED_DIR, Settings, get_settings
+from app.embed import encode_texts, load_model, mean_pool, model_name
 from app.explain import (
     build_reason,
     missing_skills as pick_missing,
@@ -29,7 +29,13 @@ from app.schemas import (
     HealthResponse,
     ScoreBreakdown,
 )
-from app.scoring import combine, section_fit_score, skill_coverage, topk_mean
+from app.scoring import (
+    combine,
+    load_calibrator,
+    section_fit_score,
+    skill_coverage,
+    topk_mean,
+)
 from app.skills import (
     extract_lexical,
     load_skills,
@@ -51,8 +57,13 @@ MAX_FILES, MIN_FILES = 30, 1
 async def lifespan(app: FastAPI):
     settings = get_settings()
     app.state.settings = settings
-    app.state.model_name = settings.model_path()
+    app.state.model_name = model_name(settings)
     app.state.model = load_model(settings)
+    app.state.calibrator = (
+        load_calibrator(settings)
+        if app.state.model_name == str(FINETUNED_DIR) else None
+    )
+    app.state.calibrator_loaded = app.state.calibrator is not None
     app.state.lexicon = load_skills()
     yield
     app.state.model = None
@@ -77,7 +88,9 @@ app = create_app()
 @app.get("/health", response_model=HealthResponse)
 async def health() -> HealthResponse:
     return HealthResponse(
-        status="ok", model=getattr(app.state, "model_name", "")
+        status="ok",
+        model=getattr(app.state, "model_name", ""),
+        calibrator_loaded=getattr(app.state, "calibrator_loaded", False),
     )
 
 
@@ -254,7 +267,13 @@ async def _score_text(
     jd_vec = mean_pool(jd_emb)
     sec_vec = mean_pool(exp_emb)
     section_s = section_fit_score(jd_vec, sec_vec)
-    parts = combine(raw_sem, skills_s, section_s, settings)
+    parts = combine(
+        raw_sem,
+        skills_s,
+        section_s,
+        settings,
+        getattr(app.state, "calibrator", None),
+    )
     best_section = _best_section(chunks, res_emb, jd_emb)
     top = rank_top_skills(matched, skill_scores, 3)
     miss = pick_missing(missing, 3)

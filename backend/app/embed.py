@@ -2,12 +2,18 @@ from __future__ import annotations
 import asyncio
 from typing import Any
 import numpy as np
+import torch
 from sentence_transformers import SentenceTransformer
 from app.config import Settings
 
 
+def model_name(settings: Settings) -> str:
+    return settings.model_path()
+
+
 def load_model(settings: Settings) -> Any:
-    return SentenceTransformer(settings.model_path())
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    return SentenceTransformer(model_name(settings), device=device)
 
 
 def embedding_dim(model: Any) -> int:

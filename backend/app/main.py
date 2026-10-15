@@ -74,7 +74,8 @@ def create_app() -> FastAPI:
     app = FastAPI(title="Shortlist Screener", lifespan=lifespan)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.origin_list(),
+        allow_origins=["*"],
+        #allow_origins=settings.origin_list(),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -222,6 +223,7 @@ async def _score_text(
     ) if exp_proj else []
     resume_texts = [c[1] for c in chunks]
     batch = jd_chunks + resume_texts + exp_chunks + jd_skills + phrases
+    batch = [text[:1200] for text in batch]
     emb = await encode_texts(model, batch)
     n_jd, n_res, n_exp = (
         len(jd_chunks), len(resume_texts), len(exp_chunks),

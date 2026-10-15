@@ -14,11 +14,19 @@ from app.config import Settings
 from app.explain import build_reason
 from app.extract import extract_pdf
 from app.preprocess import (
+    all_chunks,
     chunk_text,
     guess_role,
+    split_sections,
+    strip_invisible_unicode,
     years_experience,
 )
-from app.skills import extract_lexical, load_skills
+from app.skills import (
+    extract_lexical,
+    load_skills,
+    skill_weights,
+    technical_skills,
+)
 
 JOB_DESCRIPTION = (
     "We need a Machine Learning Engineer with Python, PyTorch, NLP "
@@ -146,6 +154,56 @@ def test_ambiguous_generic_terms_are_not_required_skills() -> None:
     ]
 
 
+def test_full_jd_excludes_junk_and_soft_skills() -> None:
+    jd = (
+        "Integrate industrial communication protocols to ensure seamless "
+        "data flow across the automation network. Strong knowledge of "
+        "TIA Portal, OPC UA, and field instrumentation is required. "
+        "Excellent communication skills are a plus."
+    )
+    lexicon = load_skills()
+    skills = extract_lexical(jd, lexicon)
+    technical = technical_skills(skills, lexicon)
+
+    assert not {
+        "across", "strong", "plus", "ua", "communication",
+    }.intersection(technical)
+    assert "tia portal" in technical
+    assert "tia" not in technical
+    assert "opc ua" in technical
+    assert "instrumentation" in technical
+
+
+def test_longest_skill_match_suppresses_inner_match(tmp_path) -> None:
+    catalog = tmp_path / "skills.txt"
+    catalog.write_text("tia portal\ntia\n", encoding="utf-8")
+    assert extract_lexical("TIA Portal", load_skills(catalog)) == [
+        "tia portal"
+    ]
+
+
+def test_skill_aliases_and_glued_tokens() -> None:
+    lexicon = load_skills()
+    assert extract_lexical(
+        "I&C with field instruments, transmitters, PLCSCADA, "
+        "OPC-UA, PROFIBUS-DP and PROFINET-IO",
+        lexicon,
+    ) == [
+        "instrumentation", "plc", "scada", "opc ua", "profibus",
+        "profinet",
+    ]
+
+
+def test_optional_jd_skills_have_half_weight() -> None:
+    lexicon = load_skills()
+    weights = skill_weights(
+        "PLC is required. Familiarity with SCADA is a plus. "
+        "Nice-to-have experience with Modbus.",
+        lexicon,
+    )
+    assert weights == {"plc": 1.0, "scada": 0.5, "modbus": 0.5}
+
+
 def test_semantic_skill_hits_require_a_lexicon_phrase() -> None:
     from app.skills import semantic_skill_matches
 
@@ -212,6 +270,45 @@ def test_experience_is_empty_without_date_ranges() -> None:
     ) == ""
 
 
+def test_section_heading_synonyms_close_the_previous_section() -> None:
+    sections = split_sections(
+        "INTERNSHIP\nPLC commissioning\nTRAINING\n"
+        "Process control coursework\nOTHER EXPERIENCES\n"
+        "Community volunteering\nHARD SKILLS\nPLC, SCADA\n"
+        "SUMMARY\nAutomation engineer profile"
+    )
+
+    assert "PLC commissioning" in sections["experience"]
+    assert "Process control coursework" in sections["education"]
+    assert "Community volunteering" in sections["extras"]
+    assert "PLC, SCADA" in sections["skills"]
+    assert "Automation engineer profile" in sections["summary"]
+    assert "TRAINING" not in sections["experience"]
+    chunks = all_chunks(sections)
+    assert any(section == "summary" for section, _text in chunks)
+    assert any(section == "extras" for section, _text in chunks)
+
+
+def test_experience_ignores_education_and_volunteering_ranges() -> None:
+    resume = (
+        "Education\nBachelor of Engineering\n2014 - 2024\n"
+        "Experience\nAutomation Engineer\n2022 - 2024\n"
+        "Other Experiences\nSocial Media Manager\n2010 - Present"
+    )
+    assert years_experience(resume) == "2 years"
+    assert guess_role(resume) == "Automation Engineer"
+
+
+def test_experience_duration_uses_singular_year() -> None:
+    assert years_experience(
+        "Experience\nEngineer\nJan 2023 - Mar 2024"
+    ) == "1 year 2 months"
+
+
+def test_private_use_and_replacement_characters_are_removed() -> None:
+    assert strip_invisible_unicode("PLC\ue000\ufffd SCADA") == "PLC SCADA"
+
+
 def test_top_skills_follow_jd_appearance(client: TestClient) -> None:
     response = client.post(
         "/analyze",
@@ -273,6 +370,7 @@ def test_debug_explanation_is_opt_in_and_gated(
     assert set(payload) == {"results", "debug"}
     detail = payload["debug"][0]
     assert detail["candidate_name"] == payload["results"][0]["candidate_name"]
+    assert "detected_domains" not in detail
     assert {"python", "pytorch", "nlp", "fastapi"}.issubset(
         detail["jd_skills"]
     )
@@ -289,6 +387,11 @@ def test_debug_explanation_is_opt_in_and_gated(
     )
     assert formula["final_score"] == pytest.approx(
         min(1.0, max(0.0, formula["pre_clipped_score"]))
+        * formula["hard_skill_penalty"]
+    )
+    assert "sqrt" not in formula["expression"]
+    assert formula["weighted_semantic"] == pytest.approx(
+        detail["weights"]["semantic"] * detail["linear_semantic"]
     )
     assert formula["match_percentage"] == round(
         formula["final_score"] * 100

@@ -1,0 +1,4 @@
+Electrician
+Install and troubleshoot electrical wiring, read blueprints and schematics,
+use PLCs, test circuits, follow NEC and OSHA safety requirements, and
+maintain electrical panels. Requires problem solving and attention to detail.

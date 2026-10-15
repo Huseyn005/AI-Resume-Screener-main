@@ -1,9 +1,18 @@
 from __future__ import annotations
 import re
-from dataclasses import dataclass
+import csv
+from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+from app.skill_context import (
+    context_allows,
+    domains_from_skills,
+    is_occupation_term,
+    occupation_domains,
+    GENERIC_SKILLS,
+)
 
 SKILLS_PATH = (
     Path(__file__).resolve().parent.parent / "data" / "skills.txt"
@@ -14,19 +23,28 @@ STOP = {
     "this", "that", "these", "those", "we", "you", "they", "our",
     "your", "their", "i", "it",
 }
+SKILL_STOPLIST = {
+    "across", "strong", "plus", "ua", "good", "excellent",
+    "ability", "abilities", "familiarity", "knowledge", "required",
+    "preferred", "bonus", "various", "related",
+}
 AMBIGUOUS_SKILLS = {"phoenix", "lion", "flow", "equipment"}
 SINGLE_SKILLS = {"c", "r"}
 SKILLS_HEADING_RE = re.compile(
-    r"^(?:technical\s+)?skills$|^core\s+competenc(?:y|ies)$|"
-    r"^technologies$|^tech\s+stack$",
+    r"^(?:(?:technical|hard|soft)(?:\s+and\s+(?:hard|soft))?\s+)?"
+    r"skills$|^core\s+competenc(?:y|ies)$|^technologies$|^tech\s+stack$",
     re.I,
 )
 OTHER_HEADING_RE = re.compile(
-    r"^(?:work\s+)?experience$|^employment$|"
-    r"^professional\s+experience$|^work\s+history$|"
-    r"^education$|^academic$|^qualifications$|^degrees?$|"
-    r"^(?:personal\s+|selected\s+|key\s+)?projects$|"
-    r"^summary$|^objective$|^profile$",
+    r"^(?:work\s+)?experience$|^employment$|^professional\s+experience$|"
+    r"^work\s+history$|^internships?$|^internship\s+experience$|"
+    r"^education$|^training$|^courses$|^certifications?$|^academic$|"
+    r"^qualifications$|^degrees?$|^(?:personal\s+|selected\s+|key\s+)?"
+    r"projects$|^summary$|^professional\s+summary$|^about\s+me$|"
+    r"^objective$|^profile$|^volunteering$|^volunteer\s+experience$|"
+    r"^volunteer\s+work$|^organizational\s+involvement$|"
+    r"^other\s+experiences$|^achievements$|^publications$|"
+    r"^community(?:\s+involvement)?$",
     re.I,
 )
 QUALIFIED_SINGLE_RE = {
@@ -35,36 +53,90 @@ QUALIFIED_SINGLE_RE = {
 }
 
 
-@dataclass
+@dataclass(eq=False)
 class SkillLexicon:
     canonical: dict[str, str]
     patterns: list[tuple[str, re.Pattern[str]]]
+    skill_types: dict[str, str]
+    skill_domains: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    specificity: dict[str, int] = field(default_factory=dict)
+    ambiguity_rules: dict[str, str] = field(default_factory=dict)
+    combined_pattern: re.Pattern[str] | None = None
+    aliases_by_canonical: dict[str, tuple[str, ...]] = field(
+        default_factory=dict
+    )
 
 
+@lru_cache(maxsize=8)
 def load_skills(path: Path | None = None) -> SkillLexicon:
     src = path or SKILLS_PATH
     canonical: dict[str, str] = {}
-    for raw in src.read_text(encoding="utf-8").splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#") or line.isdigit():
-            continue
-        parts = [
-            p.strip().lower()
-            for p in line.split("|")
-            if (
-                p.strip()
-                and not p.strip().isdigit()
-                and p.strip().lower() not in AMBIGUOUS_SKILLS
-            )
-        ]
-        if not parts:
-            continue
-        canon = parts[0]
-        for alias in parts:
-            if canon in STOP or alias in STOP:
+    skill_types: dict[str, str] = {}
+    skill_domains: dict[str, tuple[str, ...]] = {}
+    data_files = [src]
+    for domain_file in sorted((src.parent / "skills").glob("*.txt")):
+        data_files.append(domain_file)
+    for data_file in data_files:
+        for raw in data_file.read_text(encoding="utf-8").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#") or line.isdigit():
                 continue
-            canonical[alias] = canon
-            canonical[alias.replace(" ", "")] = canon
+            parts = [part.strip().lower() for part in line.split("|")]
+            if not parts or not parts[0]:
+                continue
+            canon = parts[0]
+            markers = [part for part in parts[1:] if part in {"hard", "soft"}]
+            skill_type = markers[0] if markers else "hard"
+            aliases = [
+                part for part in parts
+                if (
+                    part
+                    and part not in {"hard", "soft"}
+                    and not part.isdigit()
+                    and part not in AMBIGUOUS_SKILLS
+                    and part not in SKILL_STOPLIST
+                )
+            ]
+            if not aliases or canon in SKILL_STOPLIST:
+                continue
+            skill_types.setdefault(canon, skill_type)
+            skill_domains.setdefault(canon, ("general",))
+            for alias in aliases:
+                if canon in STOP or alias in STOP:
+                    continue
+                canonical.setdefault(alias, canon)
+                canonical.setdefault(alias.replace(" ", ""), canon)
+
+    meta_path = src.parent / "skills_meta.tsv"
+    specificity: dict[str, int] = {}
+    ambiguity_rules: dict[str, str] = {}
+    if meta_path.is_file():
+        with meta_path.open(encoding="utf-8", newline="") as stream:
+            for row in csv.DictReader(stream, delimiter="\t"):
+                canon = row.get("canonical", "").strip().casefold()
+                if not canon:
+                    continue
+                skill_type = row.get("type", "").strip().casefold()
+                if skill_type in {"hard", "soft"}:
+                    skill_types[canon] = skill_type
+                domains = tuple(
+                    value.strip().casefold()
+                    for value in row.get("domains", "").split(",")
+                    if value.strip()
+                )
+                if domains:
+                    skill_domains[canon] = domains
+                value = row.get("specificity", "").strip()
+                if value.isdigit():
+                    specificity[canon] = min(3, max(1, int(value)))
+                rule = row.get("ambiguity_rule", "").strip()
+                if rule:
+                    ambiguity_rules[canon] = rule
+    for alias, canon in (
+        ("opc-ua", "opc ua"),
+        ("plcscada", "plcscada"),
+    ):
+        canonical.setdefault(alias, canon)
     patterns: list[tuple[str, re.Pattern[str]]] = []
     seen: set[str] = set()
     for alias, canon in sorted(
@@ -76,32 +148,197 @@ def load_skills(path: Path | None = None) -> SkillLexicon:
         escaped = re.escape(alias)
         pat = re.compile(rf"(?<![a-z0-9]){escaped}(?![a-z0-9])", re.I)
         patterns.append((canon, pat))
-    return SkillLexicon(canonical=canonical, patterns=patterns)
+    alternatives = "|".join(
+        re.escape(alias)
+        for alias in sorted(canonical, key=len, reverse=True)
+        if alias
+    )
+    combined_pattern = (
+        re.compile(
+            rf"(?<![a-z0-9])(?P<alias>{alternatives})(?![a-z0-9])",
+            re.I,
+        )
+        if alternatives else None
+    )
+    aliases_by_canonical_mutable: dict[str, list[str]] = {}
+    for alias, canon in canonical.items():
+        aliases_by_canonical_mutable.setdefault(canon, []).append(alias)
+    aliases_by_canonical = {
+        canon: tuple(aliases)
+        for canon, aliases in aliases_by_canonical_mutable.items()
+    }
+    return SkillLexicon(
+        canonical=canonical,
+        patterns=patterns,
+        skill_types=skill_types,
+        skill_domains=skill_domains,
+        specificity=specificity,
+        ambiguity_rules=ambiguity_rules,
+        combined_pattern=combined_pattern,
+        aliases_by_canonical=aliases_by_canonical,
+    )
 
 
 def extract_lexical(text: str, lexicon: SkillLexicon) -> list[str]:
-    hits: list[tuple[int, int, int, str]] = []
+    if len(text) > 50000:
+        return _extract_lexical(text, lexicon)
+    return list(_extract_lexical_cached(text, lexicon))
+
+
+@lru_cache(maxsize=512)
+def _extract_lexical_cached(
+        text: str,
+        lexicon: SkillLexicon,
+) -> tuple[str, ...]:
+    return tuple(_extract_lexical(text, lexicon))
+
+
+def _extract_lexical(text: str, lexicon: SkillLexicon) -> list[str]:
+    hits: list[tuple[int, int, int, str, str]] = []
     skill_ranges = _skills_ranges(text)
-    for order, (canon, pat) in enumerate(lexicon.patterns):
-        if canon in STOP:
-            continue
-        for match in pat.finditer(text):
-            if canon in SINGLE_SKILLS and not _single_skill_allowed(
-                    canon, match.start(), text, skill_ranges
-            ):
+    if lexicon.combined_pattern:
+        for order, match in enumerate(
+                lexicon.combined_pattern.finditer(text)
+        ):
+            alias = match.group("alias").casefold()
+            canon = lexicon.canonical[alias]
+            if canon == "plcscada":
+                hits.extend((
+                    (
+                        match.start(), match.start() + 3, order,
+                        "plc", match.group()[:3],
+                    ),
+                    (
+                        match.start() + 3, match.end(), order,
+                        "scada", match.group()[3:],
+                    ),
+                ))
                 continue
             hits.append(
-                (match.start(), -len(match.group()), order, canon)
+                (
+                    match.start(), match.end(), order, canon,
+                    match.group(),
+                )
             )
-    hits.sort()
+    else:
+        for order, (canon, pat) in enumerate(lexicon.patterns):
+            if canon in STOP or canon in SKILL_STOPLIST:
+                continue
+            for match in pat.finditer(text):
+                if canon == "plcscada":
+                    hits.extend((
+                        (
+                            match.start(), match.start() + 3, order,
+                            "plc", match.group()[:3],
+                        ),
+                        (
+                            match.start() + 3, match.end(), order,
+                            "scada", match.group()[3:],
+                        ),
+                    ))
+                    continue
+                hits.append(
+                    (
+                        match.start(), match.end(), order, canon,
+                        match.group(),
+                    )
+                )
+    domains = occupation_domains(text)
+    for _start, _end, _order, canon, _alias in hits:
+        if (
+            lexicon.skill_types.get(canon) == "soft"
+            or canon in GENERIC_SKILLS
+            or canon in lexicon.ambiguity_rules
+        ):
+            continue
+        domains.update(lexicon.skill_domains.get(canon, ("general",)))
+    domains = domains or {"general"}
+    filtered = []
+    for hit in hits:
+        start, end, _order, canon, alias = hit
+        if canon == "chef":
+            if not context_allows(
+                    canon, text, start, end, domains, skill_ranges, alias
+            ):
+                continue
+        elif is_occupation_term(canon, alias):
+            continue
+        if canon in GENERIC_SKILLS:
+            continue
+        if not context_allows(
+                canon, text, start, end, domains, skill_ranges, alias
+        ):
+            continue
+        filtered.append(hit)
+    hits = filtered
+    hits.sort(key=lambda hit: (hit[0], -(hit[1] - hit[0]), hit[2]))
+    selected: list[tuple[int, int, int, str, str]] = []
+    for hit in hits:
+        start, end, _order, _canon, _alias = hit
+        overlaps = [
+            prior for prior in selected
+            if start < prior[1] and prior[0] < end
+        ]
+        if not overlaps:
+            selected.append(hit)
+            continue
+        if any(prior[1] - prior[0] >= end - start for prior in overlaps):
+            continue
+        selected = [prior for prior in selected if prior not in overlaps]
+        selected.append(hit)
+    selected.sort(key=lambda hit: (hit[0], hit[1]))
     found: list[str] = []
     seen: set[str] = set()
-    for _start, _length, _order, canon in hits:
+    for _start, _end, _order, canon, _alias in selected:
+        if canon == "plcscada":
+            continue
         if canon in seen:
             continue
         seen.add(canon)
         found.append(canon)
     return found
+
+
+def technical_skills(
+        skills: list[str],
+        lexicon: SkillLexicon,
+) -> list[str]:
+    return [
+        skill for skill in skills
+        if lexicon.skill_types.get(skill, "hard") == "hard"
+    ]
+
+
+def skill_weights(text: str, lexicon: SkillLexicon) -> dict[str, float]:
+    weights = {skill: 1.0 for skill in technical_skills(
+        extract_lexical(text, lexicon), lexicon
+    )}
+    optional = re.compile(
+        r"\b(?:plus|preferred|nice[\s-]+to[\s-]+have|bonus|familiarity)\b",
+        re.I,
+    )
+    for skill in weights:
+        for alias in lexicon.aliases_by_canonical.get(skill, ()):
+            pattern = re.compile(
+                rf"(?<![a-z0-9]){re.escape(alias)}(?![a-z0-9])",
+                re.I,
+            )
+            for match in pattern.finditer(text):
+                left = max(
+                    text.rfind(mark, 0, match.start())
+                    for mark in (".", "!", "?", ";", "\n")
+                )
+                ends = [
+                    index for mark in (".", "!", "?", ";", "\n")
+                    if (index := text.find(mark, match.end())) >= 0
+                ]
+                right = min(ends) if ends else len(text)
+                if optional.search(text[left + 1:right]):
+                    weights[skill] = 0.5
+                    break
+            if weights[skill] == 0.5:
+                break
+    return weights
 
 
 def _skills_ranges(text: str) -> list[tuple[int, int]]:

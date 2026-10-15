@@ -1,0 +1,302 @@
+1cadcam unigraphics|1cadcam unigraphics
+accelrys cerius2|accelrys cerius2
+adobe livemotion|adobe livemotion
+aeronautical charts|aeronautical charts
+agilent technologies genespring gx|agilent technologies genespring gx
+agisoft metashape|agisoft metashape
+air dispersion modeling software|air dispersion modeling software
+airdata|airdata
+altera quartus ii|altera quartus ii
+ansoft simplorer|ansoft simplorer
+ansys fluent|ansys fluent
+ansys ls-dyna|ansys ls-dyna
+ansys multiphysics|ansys multiphysics
+ansys simulation software|ansys simulation software
+apache jmeter|apache jmeter
+ardupilot mission planner|ardupilot mission planner
+aurora helioscope|aurora helioscope
+autodesk 3d studio viz|autodesk 3d studio viz
+autodesk algor simulation|autodesk algor simulation
+autodesk autocad civil 3d|autodesk autocad civil 3d
+autodesk autocad lt|autodesk autocad lt
+autodesk autocad map 3d|autodesk autocad map 3d
+autodesk autocad mechanical|autodesk autocad mechanical
+autodesk caice visual transportation|autodesk caice visual transportation
+autodesk inventor|autodesk inventor
+autodesk land desktop|autodesk land desktop
+autodesk navisworks|autodesk navisworks
+autodesk softdesk|autodesk softdesk
+availability prediction modeling software|availability prediction modeling software
+aveva intouch hmi|aveva intouch hmi
+bd biosciences cellquest|bd biosciences cellquest
+bentley geopak bridge|bentley geopak bridge
+bentley inroads suite|bentley inroads suite
+bentley microstation|bentley microstation
+bentley staad|bentley staad
+bentley systems gint|bentley systems gint
+bentley systems inroads suite|bentley systems inroads suite
+bentley systems projectwise|bentley systems projectwise
+bentley watercad|bentley watercad
+bill of materials software|bill of materials software
+bioconductor software|bioconductor software
+blat|blat
+brainmetric the category test|brainmetric the category test
+braintrain captain's log|braintrain captain's log
+cadence encounter test|cadence encounter test
+cadence orcad software|cadence orcad software
+cadence pspice|cadence pspice
+cadence virtuoso layout suite|cadence virtuoso layout suite
+calibration software|calibration software
+caliper transcad|caliper transcad
+camfit data limited microfit|camfit data limited microfit
+canu|canu
+carlson survcadd|carlson survcadd
+carlson survey|carlson survey
+chemstat|chemstat
+circle systems stat/transfer|circle systems stat/transfer
+circuit simulation software|circuit simulation software
+citilabs cube|citilabs cube
+clark labs idrisi andes|clark labs idrisi andes
+clover technology galena|clover technology galena
+clustalw|clustalw
+cnc mastercam|cnc mastercam
+codesys|codesys
+compass software|compass software
+comsol multiphysics|comsol multiphysics
+continuous emission management software|continuous emission management software
+coordinate geometry cogo software|coordinate geometry cogo software
+crystallography software|crystallography software
+crystalmaker|crystalmaker
+cubic synchro studio|cubic synchro studio
+dassault systemes abaqus|dassault systemes abaqus
+data acquisition software|data acquisition software
+data acquisition systems|data acquisition systems
+datasurge geopro|datasurge geopro
+dataxiom statmost|dataxiom statmost
+debuggers|debuggers
+debugging software|debugging software
+delft geosystems mstab|delft geosystems mstab
+digital mapping software|digital mapping software
+eagle point landcadd|eagle point landcadd
+earthsoft equis geology|earthsoft equis geology
+ecological risk assessment software|ecological risk assessment software
+electronic lab notebook software|electronic lab notebook software
+embedded systems testing software|embedded systems testing software
+enzymex|enzymex
+erdas er mapper|erdas er mapper
+erp software|erp software
+esri arccatalog|esri arccatalog
+esri arcgis arcpy|esri arcgis arcpy
+esri arcgis survey 123|esri arcgis survey 123
+esri arcims|esri arcims
+esri arcinfo|esri arcinfo
+esri arcmap|esri arcmap
+esri arcview|esri arcview
+esri software|esri software
+esri what if?|esri what if?
+etap|etap
+fasta|fasta
+fault modeling software|fault modeling software
+ferret|ferret
+flir thermal studio suite|flir thermal studio suite
+formula translation/translator fortran|formula translation/translator fortran
+forsk atoll|forsk atoll
+gaea technologies winsieve|gaea technologies winsieve
+gas dispersion model software|gas dispersion model software
+gaussian software|gaussian software
+ge healthcare imagequant tl|ge healthcare imagequant tl
+gemcom surpac|gemcom surpac
+gene codes sequencher|gene codes sequencher
+geo-slope seep/w|geo-slope seep/w
+global insight aremos|global insight aremos
+gnu octave|gnu octave
+golden helix helixtree|golden helix helixtree
+golden software surfer|golden software surfer
+graphic presentation software|graphic presentation software
+graphisoft archicad|graphisoft archicad
+greenhouse gas management software|greenhouse gas management software
+grid generation software|grid generation software
+groundwater modeling system gms|groundwater modeling system gms
+groundwater vistas|groundwater vistas
+hardware description language hdl|hardware description language hdl
+hec-1|hec-1
+hec-hms|hec-hms
+hec-ras|hec-ras
+hewlett packard quicktest professional|hewlett packard quicktest professional
+hewlett-packard hp openvms|hewlett-packard hp openvms
+hexagon intergraph|hexagon intergraph
+human modeling software|human modeling software
+hydraulic modeling software|hydraulic modeling software
+hydrosolve aqtesolv|hydrosolve aqtesolv
+ibm catia|ibm catia
+ihs petra|ihs petra
+image analysis software|image analysis software
+image enhancement software|image enhancement software
+image processing software|image processing software
+imsi turbocad|imsi turbocad
+interactive psychological evaluation software|interactive psychological evaluation software
+interface definition language idl|interface definition language idl
+intergraph mge|intergraph mge
+isograph markov|isograph markov
+itemtracker|itemtracker
+keb combivis studio|keb combivis studio
+kitty hawk|kitty hawk
+ladder logic|ladder logic
+landmark graphics geographix|landmark graphics geographix
+leica geosystems erdas imagine|leica geosystems erdas imagine
+life cycle cost software|life cycle cost software
+litchi|litchi
+logic synthesis software|logic synthesis software
+lp360|lp360
+lumion|lumion
+magellan firmware|magellan firmware
+magic software|magic software
+mapinfo mapmarker|mapinfo mapmarker
+mapinfo professional|mapinfo professional
+mapinfo|mapinfo
+maplesoft maple|maplesoft maple
+maptek vulcan|maptek vulcan
+mathsoft mathcad|mathsoft mathcad
+mathworks simulink|mathworks simulink
+maya nastran|maya nastran
+mcneel rhinoceros 3d|mcneel rhinoceros 3d
+mctrans center tsis-corsim|mctrans center tsis-corsim
+mctrans hcs+|mctrans hcs+
+mendel|mendel
+mentor graphics leonardospectrum|mentor graphics leonardospectrum
+mentor graphics pads|mentor graphics pads
+mentor graphics software|mentor graphics software
+microsoft image composite editor|microsoft image composite editor
+microsurvey fieldgenius|microsurvey fieldgenius
+microsurveycad|microsurveycad
+minesight|minesight
+mitre software gslope|mitre software gslope
+modeling software|modeling software
+molecular devices corporation metamorph|molecular devices corporation metamorph
+molecular simulation software|molecular simulation software
+motion graphics software|motion graphics software
+msc software adams|msc software adams
+msc software nastran|msc software nastran
+msc software patran|msc software patran
+muthen & muthen mplus|muthen & muthen mplus
+national instruments multisim|national instruments multisim
+navisworks jetstream|navisworks jetstream
+neural network modeling software|neural network modeling software
+opendronemap|opendronemap
+openroads designer|openroads designer
+optical research associates lighttools|optical research associates lighttools
+orcad capture|orcad capture
+originlab origin|originlab origin
+parameter estimation pest|parameter estimation pest
+pci express pcie|pci express pcie
+photogrammetric software|photogrammetric software
+phrap|phrap
+phred|phred
+phylip|phylip
+pix4d pix4dmapper|pix4d pix4dmapper
+primer3|primer3
+promodel|promodel
+protein explorer|protein explorer
+psychological testing software|psychological testing software
+ptc creo parametric|ptc creo parametric
+ptc pro/cable|ptc pro/cable
+ptc pro/intralink|ptc pro/intralink
+ptc pro/pipe|ptc pro/pipe
+ptv vissim|ptv vissim
+pvsyst|pvsyst
+qgis|qgis
+qualtrics insight|qualtrics insight
+quantitative micro software eviews|quantitative micro software eviews
+quickcogo|quickcogo
+rapid prototyping software|rapid prototyping software
+regulatory compliance management software|regulatory compliance management software
+reliability analysis software|reliability analysis software
+reliasoft weibull++ 6|reliasoft weibull++ 6
+reverse engineering software|reverse engineering software
+rivermorph|rivermorph
+robotic control software|robotic control software
+rockware arcmap|rockware arcmap
+rockware chemflux|rockware chemflux
+rockware modflow|rockware modflow
+rockware rockworks|rockware rockworks
+rockwell automation arena|rockwell automation arena
+rockwell rslogix|rockwell rslogix
+root cause analysis software|root cause analysis software
+rsi envi|rsi envi
+rti international sudaan|rti international sudaan
+scanning software|scanning software
+schematic design entry software|schematic design entry software
+scientific software group feflow|scientific software group feflow
+scientific software group migrate|scientific software group migrate
+scientific software group svheat|scientific software group svheat
+scientific software international hlm|scientific software international hlm
+scientific software international lisrel|scientific software international lisrel
+seismic micro-technology kingdom|seismic micro-technology kingdom
+siemens modelsim|siemens modelsim
+siemens simatic step 7|siemens simatic step 7
+siemens simatic wincc|siemens simatic wincc
+siemens solid edge|siemens solid edge
+simulation software|simulation software
+site remediation management software|site remediation management software
+sitecomp survey|sitecomp survey
+snakemake|snakemake
+softech cadra|softech cadra
+software development tools|software development tools
+soilvision systems svoffice|soilvision systems svoffice
+solidworks cosmosworks|solidworks cosmosworks
+sparta systems trackwise|sparta systems trackwise
+spectroscopy software|spectroscopy software
+starpint software super slug|starpint software super slug
+statgraphics|statgraphics
+statistical software|statistical software
+statistica|statistica
+stochastic modeling software|stochastic modeling software
+stormwater runoff modeling software|stormwater runoff modeling software
+stratasys fdm medmodeler|stratasys fdm medmodeler
+structure query language sql|structure query language sql
+sun microsystems java|sun microsystems java
+surface modeling software|surface modeling software
+survey software|survey software
+synopsys design compiler|synopsys design compiler
+synopsys hspice|synopsys hspice
+systat software sigmaplot|systat software sigmaplot
+systat software sigmastat|systat software sigmastat
+tanner eda l-edit|tanner eda l-edit
+terrasolid terrascan|terrasolid terrascan
+test automation software|test automation software
+testing software|testing software
+textco biosoftware gene inspector|textco biosoftware gene inspector
+thomson reuters endnote|thomson reuters endnote
+three-dimensional modeling software|three-dimensional modeling software
+tibco spotfire|tibco spotfire
+tool command language tcl|tool command language tcl
+traverse pc|traverse pc
+trimble geomatics office|trimble geomatics office
+trimble gps pathfinder office|trimble gps pathfinder office
+trimble pathfinder office|trimble pathfinder office
+trimble terramodel|trimble terramodel
+trimble terrasync|trimble terrasync
+ugcs|ugcs
+ugs solid edge|ugs solid edge
+user interface design software|user interface design software
+vectorworks architect|vectorworks architect
+vibration analysis software|vibration analysis software
+video analysis software|video analysis software
+visual modflow pro|visual modflow pro
+visual numerics pv-wave|visual numerics pv-wave
+visual solutions vissim|visual solutions vissim
+wam software|wam software
+waste management software|waste management software
+water flow modeling software|water flow modeling software
+waterloo hydrogeologic aquachem|waterloo hydrogeologic aquachem
+waters millennium32|waters millennium32
+watir|watir
+wavefunction spartan|wavefunction spartan
+wind flow modeling software|wind flow modeling software
+windows embedded compact|windows embedded compact
+windows kernel debuggers|windows kernel debuggers
+wolfram research mathematica|wolfram research mathematica
+wonderware software|wonderware software
+xcircuit|xcircuit
+xp software xpswmm|xp software xpswmm
+zemax|zemax

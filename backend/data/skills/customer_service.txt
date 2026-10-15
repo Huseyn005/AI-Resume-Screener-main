@@ -1,0 +1,199 @@
+customer service
+customer support
+customer service operations
+customer experience management
+customer satisfaction
+customer complaint resolution
+complaint handling
+customer escalation management
+call center operations
+contact center operations
+contact center quality assurance
+call monitoring
+inbound call handling
+outbound call handling
+live chat support
+email support
+technical customer support
+help desk support
+service desk support
+Zendesk
+Freshdesk
+Intercom
+Salesforce Service Cloud
+customer relationship management|CRM
+ticket management
+case management
+service request management
+knowledge base management
+customer support documentation
+service level agreement management|SLA management
+first call resolution
+first contact resolution
+average handle time
+customer retention
+customer onboarding
+customer account support
+customer inquiry resolution
+returns processing
+refund processing
+product exchanges
+order processing
+order fulfillment
+order tracking
+point of sale|POS
+retail sales
+retail operations
+retail merchandising
+visual merchandising
+inventory replenishment
+stock replenishment
+stockroom operations
+cycle counting
+cash handling
+cash register operation
+cash reconciliation
+loss prevention
+shrink reduction
+retail loss prevention
+store opening and closing
+store operations
+retail inventory management
+product knowledge
+upselling
+cross-selling
+retail customer service
+omnichannel customer service
+customer feedback analysis
+customer survey administration
+customer service quality monitoring
+service recovery
+customer loyalty programs
+loyalty program administration
+retail scheduling
+workforce scheduling
+merchandise receiving
+goods receiving
+stock control
+retail compliance
+consumer protection compliance
+PCI compliance
+payment processing
+card payment processing
+cash drawer balancing
+retail safety
+store safety inspections
+customer service training
+customer support training
+service operations reporting
+customer service metrics
+net promoter score|NPS
+customer satisfaction score|CSAT
+customer effort score|CES
+customer experience analytics
+service quality management
+appointment scheduling
+reservation management
+front desk operations
+guest relations
+hospitality service
+retail returns management
+merchandise pricing
+planogram execution
+shelf stocking
+product display
+inventory accuracy
+customer data privacy
+consumer complaint management
+customer service workflow
+customer service process improvement
+customer service knowledge management
+customer service quality assurance
+customer service workforce management
+customer service workforce forecasting
+customer service performance reporting
+customer service coaching
+customer service escalation procedures
+customer service policy administration
+customer account maintenance
+customer identity verification
+customer authentication
+customer data verification
+customer billing support
+subscription management
+subscription cancellation processing
+account cancellation handling
+account activation support
+account recovery support
+product troubleshooting
+technical troubleshooting
+service troubleshooting
+product returns authorization
+return merchandise authorization|RMA
+replacement order processing
+warranty claim processing
+warranty administration
+service warranty coordination
+order status inquiries
+delivery issue resolution
+shipping issue resolution
+payment dispute resolution
+billing dispute resolution
+chargeback processing
+merchant services support
+customer retention outreach
+customer win-back campaigns
+customer success onboarding
+customer health scoring
+customer service case documentation
+customer interaction documentation
+call center workforce management
+call center scheduling
+contact center forecasting
+contact center reporting
+call center quality monitoring
+speech analytics
+customer sentiment analysis
+customer service journey mapping
+service blueprinting
+customer experience improvement
+customer service analytics
+customer escalation reporting
+customer issue prioritization
+customer service knowledge articles
+customer self-service portals
+customer support portal administration
+service desk ticket triage
+technical support ticketing
+IT service management|ITSM
+incident management
+problem management
+service request fulfillment
+service catalog management
+service desk operations
+service desk metrics
+first-level technical support
+second-level technical support
+customer loyalty analytics
+customer feedback management
+customer satisfaction analysis
+retail transaction processing
+retail cash reconciliation
+retail merchandising execution
+retail inventory replenishment
+retail shelf labeling
+retail point of sale administration
+retail payment reconciliation
+retail sales reporting
+store merchandise planning
+store inventory audits
+stockroom inventory control
+omnichannel order management
+click and collect fulfillment
+buy online pick up in store|BOPIS
+curbside pickup operations
+retail service recovery
+store customer engagement
+consumer returns policy
+retail product demonstrations
+customer service compliance

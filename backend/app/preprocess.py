@@ -1,6 +1,7 @@
 from __future__ import annotations
 from datetime import date
 import re
+import unicodedata
 from collections.abc import Callable
 
 EMAIL_RE = re.compile(r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b", re.I)
@@ -19,21 +20,35 @@ ADDR_RE = re.compile(
 )
 HEADINGS = {
     "experience": re.compile(
-        r"^(?:work\s+)?experience|employment|"
-        r"professional\s+experience|work\s+history$",
+        r"(?:experience|work experience|employment|"
+        r"professional experience|work history|internship|internships|"
+        r"internship experience)",
         re.I,
     ),
     "skills": re.compile(
-        r"^(?:technical\s+)?skills|core\s+competenc(?:y|ies)|"
-        r"technologies|tech\s+stack$",
+        r"(?:skills|technical skills|hard skills|soft skills|"
+        r"hard and soft skills|technical and soft skills|"
+        r"core competency|core competencies|technologies|tech stack)",
         re.I,
     ),
     "education": re.compile(
-        r"^education|academic|qualifications|degrees?$",
+        r"(?:education|training|courses|certifications|academic|"
+        r"qualifications|degree|degrees)",
         re.I,
     ),
     "projects": re.compile(
-        r"^(?:personal\s+|selected\s+|key\s+)?projects$",
+        r"(?:projects|personal projects|selected projects|key projects)",
+        re.I,
+    ),
+    "summary": re.compile(
+        r"(?:summary|professional summary|objective|about me|profile)",
+        re.I,
+    ),
+    "extras": re.compile(
+        r"(?:volunteering|volunteer experience|volunteer work|"
+        r"organizational involvement|other experiences|achievements|"
+        r"publications|community|community involvement|"
+        r"extracurricular activities)",
         re.I,
     ),
 }
@@ -63,7 +78,7 @@ DATE_TOKEN = (
 )
 DATE_RANGE_RE = re.compile(
     rf"(?P<start>{DATE_TOKEN})\s*(?:-|–|—|to)\s*"
-    rf"(?P<end>{DATE_TOKEN}|present|current|now)",
+    rf"(?P<end>{DATE_TOKEN}|present|current|now|ongoing)",
     re.I,
 )
 def scrub_pii(text: str) -> str:
@@ -74,12 +89,21 @@ def scrub_pii(text: str) -> str:
     return text
 
 
+def strip_invisible_unicode(text: str) -> str:
+    return "".join(
+        char for char in text
+        if char != "\ufffd" and unicodedata.category(char) != "Co"
+    )
+
+
 def split_sections(text: str) -> dict[str, str]:
     buckets: dict[str, list[str]] = {
         "experience": [],
         "skills": [],
         "education": [],
         "projects": [],
+        "summary": [],
+        "extras": [],
         "other": [],
     }
     current = "other"
@@ -97,7 +121,7 @@ def _heading_key(line: str) -> str | None:
     if not stripped or len(stripped) > 48:
         return None
     for name, pat in HEADINGS.items():
-        if pat.match(stripped):
+        if pat.fullmatch(stripped):
             return name
     return None
 
@@ -171,7 +195,8 @@ def all_chunks(
 ) -> list[tuple[str, str]]:
     out: list[tuple[str, str]] = []
     order = (
-        "experience", "projects", "skills", "education", "other",
+        "experience", "projects", "skills", "education", "summary",
+        "extras", "other",
     )
     for name in order:
         body = sections.get(name) or ""
@@ -190,7 +215,7 @@ def guess_role(text: str) -> str:
     lines = text.splitlines()
     in_experience = False
     seen_heading = False
-    top_lines: list[str] = []
+    before_sections: list[str] = []
     experience_lines: list[str] = []
     for line in lines:
         key = _heading_key(line)
@@ -201,12 +226,17 @@ def guess_role(text: str) -> str:
         if in_experience:
             experience_lines.append(line)
         elif not seen_heading:
-            top_lines.append(line)
-    for line in top_lines[:12]:
-        title = _role_candidate(line)
-        if title:
-            return title
-    return _most_recent_role(experience_lines)
+            before_sections.append(line)
+    role = _most_recent_role(experience_lines)
+    if role:
+        return role
+    return next(
+        (
+            title for line in before_sections[:12]
+            if (title := _role_candidate(line))
+        ),
+        "",
+    )
 
 
 def years_experience(text: str) -> str:
@@ -227,7 +257,8 @@ def years_experience(text: str) -> str:
     years, remainder = divmod(months, 12)
     if not remainder:
         return f"{years} year" if years == 1 else f"{years} years"
-    return f"{years} years {remainder} months"
+    year_label = "year" if years == 1 else "years"
+    return f"{years} {year_label} {remainder} months"
 
 
 def _role_candidate(line: str) -> str:
@@ -278,7 +309,7 @@ def _date_ranges(text: str) -> list[tuple[int, int]]:
 def _date_range(match: re.Match[str]) -> tuple[int, int]:
     start = _date_index(match.group("start"))
     end_text = match.group("end")
-    if end_text.casefold() in {"present", "current", "now"}:
+    if end_text.casefold() in {"present", "current", "now", "ongoing"}:
         today = date.today()
         end = today.year * 12 + today.month - 1
     else:

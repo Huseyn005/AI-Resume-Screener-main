@@ -1,0 +1,5 @@
+Process Automation Engineer
+Design and commission PLC and SCADA systems, configure Siemens TIA Portal,
+HMI and DCS applications, integrate OPC UA and industrial networks, and
+troubleshoot instrumentation. Requires control systems, project management,
+and safety experience.

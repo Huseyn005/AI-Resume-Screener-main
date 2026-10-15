@@ -1,0 +1,138 @@
+[
+  {
+    "jd": "accountant",
+    "hard_skills": [
+      "ledger",
+      "end",
+      "budgeting",
+      "excel"
+    ],
+    "soft_skills": [
+      "communication"
+    ],
+    "hard_skill_count": 4
+  },
+  {
+    "jd": "electrician",
+    "hard_skills": [
+      "plc"
+    ],
+    "soft_skills": [
+      "problem solving",
+      "attention to detail"
+    ],
+    "hard_skill_count": 1
+  },
+  {
+    "jd": "head_chef",
+    "hard_skills": [
+      "chef",
+      "inventory",
+      "coordinate"
+    ],
+    "soft_skills": [
+      "leadership",
+      "communication",
+      "adaptability"
+    ],
+    "hard_skill_count": 3
+  },
+  {
+    "jd": "history_teacher",
+    "hard_skills": [],
+    "soft_skills": [],
+    "hard_skill_count": 0
+  },
+  {
+    "jd": "hr_specialist",
+    "hard_skills": [],
+    "soft_skills": [
+      "communication"
+    ],
+    "hard_skill_count": 0
+  },
+  {
+    "jd": "java_developer",
+    "hard_skills": [
+      "java",
+      "spring",
+      "rest",
+      "sql",
+      "git",
+      "docker",
+      "kubernetes",
+      "aws",
+      "product"
+    ],
+    "soft_skills": [
+      "problem solving",
+      "communication"
+    ],
+    "hard_skill_count": 9
+  },
+  {
+    "jd": "line_cook",
+    "hard_skills": [],
+    "soft_skills": [
+      "teamwork",
+      "communication"
+    ],
+    "hard_skill_count": 0
+  },
+  {
+    "jd": "nurse",
+    "hard_skills": [
+      "vital"
+    ],
+    "soft_skills": [
+      "communication",
+      "teamwork"
+    ],
+    "hard_skill_count": 1
+  },
+  {
+    "jd": "process_automation_engineer",
+    "hard_skills": [
+      "plc",
+      "scada",
+      "tia portal",
+      "hmi",
+      "dcs",
+      "opc ua",
+      "instrumentation",
+      "control systems",
+      "project management"
+    ],
+    "soft_skills": [],
+    "hard_skill_count": 9
+  },
+  {
+    "jd": "sales_rep",
+    "hard_skills": [
+      "product",
+      "crm"
+    ],
+    "soft_skills": [
+      "communication"
+    ],
+    "hard_skill_count": 2
+  },
+  {
+    "jd": "social_media_manager",
+    "hard_skills": [],
+    "soft_skills": [
+      "creativity",
+      "communication"
+    ],
+    "hard_skill_count": 0
+  },
+  {
+    "jd": "truck_driver",
+    "hard_skills": [
+      "dot",
+      "cargo"
+    ],
+    "soft_skills": [],
+    "hard_skill_count": 2
+  }
+]

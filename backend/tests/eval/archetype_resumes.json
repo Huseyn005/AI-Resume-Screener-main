@@ -1,0 +1,22 @@
+[
+  {
+    "archetype": "practitioner",
+    "name": "Alex Morgan",
+    "text": "Alex Morgan\nAutomation Engineer\nExperience\nAutomation Engineer\n2021 - Present\nProgrammed and commissioned PLC systems, configured HMI and SCADA screens, integrated DCS and Modbus networks, tuned PID loops, and used MATLAB for industrial process troubleshooting and manufacturing safety.\nProjects\nDelivered PLC and HMI upgrades for a manufacturing line, including SCADA alarms and process control testing.\nSkills\nPLC, HMI, SCADA, DCS, Modbus, PID, MATLAB"
+  },
+  {
+    "archetype": "intern",
+    "name": "Nora Ali",
+    "text": "Nora Ali\nInstrument and Control Engineer Intern\nExperience\nInstrument and Control Engineer Intern\n2024 - Present\nSupported I&C commissioning and field instrument calibration. Configured PLC and SCADA systems, tested HMI alarms, connected Modbus devices, and helped troubleshoot process control and manufacturing safety issues.\nSkills\nI&C, Modbus, PLC, SCADA, HMI"
+  },
+  {
+    "archetype": "coursework-only",
+    "name": "Sam Lee",
+    "text": "Sam Lee\nProcess Engineering Student\nTraining\nCoursework keywords only: PLC, SCADA, HMI, DCS, Modbus, PID, MATLAB, instrumentation, process control, troubleshooting, safety systems, manufacturing, embedded, ESP32, IoT.\nExperience\nProcess Engineering Intern\n2024 - 2024\nRecorded production yields, prepared shift reports, observed batch operations, and organized process documentation."
+  },
+  {
+    "archetype": "embedded-student",
+    "name": "Jamie Chen",
+    "text": "Jamie Chen\nEmbedded Systems Student\nProjects\nEmbedded systems hackathon project using ESP32 microcontrollers, C++, IoT sensors, wireless communication, and a web dashboard. Built a prototype data logger and tested battery usage.\nSkills\nEmbedded C++, ESP32, IoT, microcontrollers, wireless communication"
+  }
+]

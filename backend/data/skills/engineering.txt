@@ -1,0 +1,151 @@
+process control
+process automation
+industrial automation
+automation system design
+control system design
+control system commissioning
+process engineering
+process optimization
+process simulation
+process modeling
+industrial process control
+distributed control system|DCS
+supervisory control and data acquisition|SCADA
+human machine interface|HMI
+programmable logic controller|PLC
+programmable automation controller|PAC
+industrial control system|ICS
+control loop tuning
+PID tuning
+instrument calibration
+control valve calibration
+flow meter calibration
+pressure transmitter calibration
+temperature sensor calibration
+industrial instrumentation
+industrial networking
+industrial ethernet
+Modbus TCP
+Modbus RTU
+OPC UA
+PROFINET
+PROFIBUS
+EtherNet/IP
+DeviceNet
+CAN bus
+serial communications
+process safety management
+hazard and operability study|HAZOP
+layers of protection analysis|LOPA
+safety instrumented system|SIS
+safety integrity level|SIL
+functional safety
+IEC 61511
+IEC 61508
+industrial cybersecurity
+OT cybersecurity
+manufacturing execution system|MES
+plant information management system|PIMS
+historian configuration
+industrial data historian
+alarm management
+alarm rationalization
+control narrative development
+cause and effect matrix
+process flow diagram|PFD
+piping and instrumentation diagram|P&ID
+engineering design review
+factory acceptance testing|FAT
+site acceptance testing|SAT
+commissioning and startup
+plant commissioning
+equipment commissioning
+loop checks
+instrument loop diagrams
+electrical single-line diagrams
+control panel design
+electrical control schematics
+electrical CAD
+AutoCAD Electrical
+EPLAN Electric P8
+Siemens TIA Portal
+Rockwell Studio 5000
+Allen-Bradley ControlLogix
+Siemens S7 PLC
+Schneider EcoStruxure
+Honeywell Experion
+Emerson DeltaV
+ABB 800xA
+Yokogawa CENTUM
+FactoryTalk View
+WinCC
+Wonderware System Platform
+Ignition SCADA
+AVEVA System Platform
+industrial robot programming
+robot cell integration
+robot safety systems
+manufacturing process validation
+process capability analysis
+statistical process control|SPC
+design of experiments|DOE
+failure mode and effects analysis|FMEA
+root cause analysis
+reliability engineering
+maintenance engineering
+asset integrity management
+engineering change management
+technical specifications
+engineering calculations
+engineering project documentation
+equipment sizing
+heat and mass balance
+thermodynamic analysis
+fluid mechanics
+computational fluid dynamics|CFD
+finite element analysis|FEA
+structural analysis
+mechanical design
+electrical power systems
+power system analysis
+transformer testing
+switchgear testing
+protective relay testing
+substation commissioning
+renewable energy systems
+solar photovoltaic design
+wind turbine systems
+energy management systems
+autocad
+building information modeling
+commissioning
+control system integration
+control valve sizing
+computer-aided design
+computer-aided manufacturing
+computer-aided engineering
+dcs configuration
+electrical schematics
+engineering design
+engineering project management
+failure analysis
+gd&t
+heat transfer
+instrument loop checks
+isa-88
+isa-95
+machine design
+material science
+modbus
+motor control systems
+p&id development
+pfd development
+pid control tuning
+predictive maintenance
+process hazard analysis
+quality engineering
+requirements engineering
+solidworks
+systems integration
+technical documentation
+verification and validation

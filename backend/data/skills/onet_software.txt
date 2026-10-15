@@ -1,0 +1,380 @@
+3m post-it app|3m post-it app
+a programming language apl|a programming language apl
+abc compiler|abc compiler
+access management software|access management software
+accessdata ftk|accessdata ftk
+acronis recovery expert|acronis recovery expert
+active directory software|active directory software
+adeptia etl suite|adeptia etl suite
+ado.net|ado.net
+adobe coldfusion|adobe coldfusion
+adobe flex|adobe flex
+ajax|ajax
+algorithmic language algol|algorithmic language algol
+allaire coldfusion|allaire coldfusion
+altova mapforce|altova mapforce
+amazon data pipeline|amazon data pipeline
+amazon dynamodb|amazon dynamodb
+amazon kinesis|amazon kinesis
+amazon redshift|amazon redshift
+ansible software|ansible software
+anti-spyware software|anti-spyware software
+antivirus software|antivirus software
+apache ant|apache ant
+apache avro|apache avro
+apache cassandra|apache cassandra
+apache flume|apache flume
+apache groovy|apache groovy
+apache hadoop|apache hadoop
+apache hbase|apache hbase
+apache hive|apache hive
+apache http server|apache http server
+apache kafka|apache kafka
+apache mahout|apache mahout
+apache maven|apache maven
+apache oozie|apache oozie
+apache pig|apache pig
+apache solr|apache solr
+apache sqoop|apache sqoop
+apache struts|apache struts
+apache subversion svn|apache subversion svn
+apache tomcat|apache tomcat
+apatar|apatar
+apple cocoa|apple cocoa
+application management software|application management software
+asg technologies asg-zeke|asg technologies asg-zeke
+atlassian bamboo|atlassian bamboo
+atlassian bitbucket|atlassian bitbucket
+atlassian confluence|atlassian confluence
+automated installation software|automated installation software
+avaya identity engines|avaya identity engines
+awk|awk
+b-method|b-method
+backbone.js|backbone.js
+backup and archival software|backup and archival software
+bigloo scheme|bigloo scheme
+bmc software change manager|bmc software change manager
+bmc software control-m|bmc software control-m
+border gateway protocol bgp|border gateway protocol bgp
+ca easytrieve report generator|ca easytrieve report generator
+ca idms|ca idms
+call-processing language cpl|call-processing language cpl
+catalog navigation software|catalog navigation software
+central desktop|central desktop
+chatbot software|chatbot software
+cisco ios|cisco ios
+cisco systems ciscoworks|cisco systems ciscoworks
+citrix cloud computing software|citrix cloud computing software
+citrix xenapp|citrix xenapp
+clarity systems ibm clarity|clarity systems ibm clarity
+cloudera impala|cloudera impala
+cloveretl|cloveretl
+cluster server software|cluster server software
+coglin mill rodin|coglin mill rodin
+command interpreters|command interpreters
+common gateway interface cgi|common gateway interface cgi
+computer associates log analyzer|computer associates log analyzer
+computer forensic software|computer forensic software
+concurrency control software|concurrency control software
+couchbase server|couchbase server
+crosstec netop remote control|crosstec netop remote control
+cruisecontrol|cruisecontrol
+dartware intermapper|dartware intermapper
+data definition language ddl|data definition language ddl
+data dictionary software|data dictionary software
+data manipulation language dml|data manipulation language dml
+data mapping software|data mapping software
+data modeling software|data modeling software
+data validation software|data validation software
+database capacity planning software|database capacity planning software
+database cloning software|database cloning software
+database design software|database design software
+database security software|database security software
+database testing software|database testing software
+datadescription datadesk|datadescription datadesk
+datavision|datavision
+dbase plus|dbase plus
+defect tracking software|defect tracking software
+deployment software|deployment software
+diagramming software|diagramming software
+disk operating system dos|disk operating system dos
+distributed database management software|distributed database management software
+domain name system dns|domain name system dns
+dos shell script|dos shell script
+dynamic analysis software|dynamic analysis software
+dynamic modeling software|dynamic modeling software
+e++ pattern language|e++ pattern language
+eclipse ide|eclipse ide
+eiffel|eiffel
+element management software|element management software
+ellucian banner erp|ellucian banner erp
+emass|emass
+embarcadero delphi|embarcadero delphi
+embarcadero jbuilder|embarcadero jbuilder
+embarcadero technologies dbartisan|embarcadero technologies dbartisan
+embedded systems development software|embedded systems development software
+emc networker|emc networker
+encryption software|encryption software
+enterprise javabeans|enterprise javabeans
+ethereal|ethereal
+ext js|ext js
+extensible stylesheet language xsl|extensible stylesheet language xsl
+fault testing software|fault testing software
+file server software|file server software
+firewall software|firewall software
+flat file checker|flat file checker
+flexbox|flexbox
+functional testing software|functional testing software
+gambit scheme|gambit scheme
+google android|google android
+google angular|google angular
+google cloud software|google cloud software
+google looker analytics|google looker analytics
+google sites|google sites
+grafana labs grafana cloud|grafana labs grafana cloud
+graphpad software graphpad prism|graphpad software graphpad prism
+greenplum database|greenplum database
+hashicorp vagrant|hashicorp vagrant
+help desk software|help desk software
+hewlett packard hp-ux|hewlett packard hp-ux
+hewlett packard loadrunner|hewlett packard loadrunner
+hibernate orm|hibernate orm
+hit software allora|hit software allora
+honeypot|honeypot
+hp dataprotector|hp dataprotector
+hp webinspect|hp webinspect
+huggingface|hugging face
+ibm adstar|ibm adstar
+ibm aix|ibm aix
+ibm db2|ibm db2
+ibm domino|ibm domino
+ibm informix|ibm informix
+ibm infosphere datastage|ibm infosphere datastage
+ibm middleware|ibm middleware
+ibm qradar siem|ibm qradar siem
+ibm rational build forge|ibm rational build forge
+ibm rational clearcase|ibm rational clearcase
+ibm rational data architect|ibm rational data architect
+ibm rational purifyplus|ibm rational purifyplus
+ibm rational rose xde|ibm rational rose xde
+ibm spss amos|ibm spss amos
+ibm terraform|ibm terraform
+ibm tivoli software|ibm tivoli software
+ibm websphere mq|ibm websphere mq
+ibm websphere|ibm websphere
+icon programming language|icon programming language
+iea software emerald|iea software emerald
+index tuning software|index tuning software
+informatica big data|informatica big data
+informatica corporation powercenter|informatica corporation powercenter
+informatica powercenter|informatica powercenter
+informatica software|informatica software
+integration testing software|integration testing software
+interoperability testing software|interoperability testing software
+interstate connection icon|interstate connection icon
+intrusion detection system ids|intrusion detection system ids
+intrusion prevention system ips|intrusion prevention system ips
+invision software|invision software
+javascript framework software|javascript framework software
+javascript object notation json|javascript object notation json
+jenkins ci|jenkins ci
+jetbrains phpstorm|jetbrains phpstorm
+jitterbit|jitterbit
+job control language jcl|job control language jcl
+jupyter notebook|jupyter notebook
+kali linux|kali linux
+kornshell|kornshell
+lamp stack|lamp stack
+libreoffice|libreoffice
+list processing language lisp|list processing language lisp
+load testing software|load testing software
+logmatrix nervecenter|logmatrix nervecenter
+mac helpmate|mac helpmate
+mapr converged data platform|mapr converged data platform
+marklogic|marklogic
+mcafee virusscan|mcafee virusscan
+meteorjs|meteorjs
+micro focus openview|micro focus openview
+microservices architecture|microservices architecture
+microsoft .net framework|microsoft .net framework
+microsoft active directory|microsoft active directory
+microsoft activex|microsoft activex
+microsoft asp.net core mvc|microsoft asp.net core mvc
+microsoft asp.net|microsoft asp.net
+microsoft azure data factory|microsoft azure data factory
+microsoft azure devops services|microsoft azure devops services
+microsoft azure software|microsoft azure software
+microsoft commerce server|microsoft commerce server
+microsoft defender antivirus|microsoft defender antivirus
+microsoft directx|microsoft directx
+microsoft esp sdk|microsoft esp sdk
+microsoft hyper-v server|microsoft hyper-v server
+microsoft playwright|microsoft playwright
+microsoft power automate|microsoft power automate
+microsoft power platform software|microsoft power platform software
+microsoft powershell|microsoft powershell
+microsoft team foundation server|microsoft team foundation server
+microsoft visual basic.net|microsoft visual basic.net
+microsoft visual c# .net|microsoft visual c# .net
+microsoft visual interdev|microsoft visual interdev
+microsoft visual sourcesafe|microsoft visual sourcesafe
+microsoft windows server|microsoft windows server
+microsoft windows sysprep|microsoft windows sysprep
+migration software|migration software
+migration testing software|migration testing software
+mitre att&ck software|mitre att&ck software
+modula|modula
+mumps m|mumps m
+mutation testing software|mutation testing software
+nagios|nagios
+network availability monitoring software|network availability monitoring software
+network directory services software|network directory services software
+network documentation software|network documentation software
+network intrusion detection software|network intrusion detection software
+network management software|network management software
+network traffic probe software|network traffic probe software
+norton antivirus|norton antivirus
+nosql|nosql
+novastor novabackup|novastor novabackup
+nunjucks|nunjucks
+oberon|oberon
+objective caml|objective caml
+objective c|objective c
+online traffic calculator software|online traffic calculator software
+open graphics library opengl|open graphics library opengl
+openai chatgpt|openai chatgpt
+operating system shells|operating system shells
+oracle application express apex|oracle application express apex
+oracle application server|oracle application server
+oracle business intelligence discoverer|oracle business intelligence discoverer
+oracle business intelligence suite|oracle business intelligence suite
+oracle cloud software|oracle cloud software
+oracle data guard|oracle data guard
+oracle designer|oracle designer
+oracle enterprise manager|oracle enterprise manager
+oracle fusion middleware|oracle fusion middleware
+oracle golden gate|oracle golden gate
+oracle javaserver pages jsp|oracle javaserver pages jsp
+oracle jdbc|oracle jdbc
+oracle net manager|oracle net manager
+oracle pl/sql|oracle pl/sql
+oracle reports|oracle reports
+oracle solaris|oracle solaris
+oracle sql developer|oracle sql developer
+oracle sql loader|oracle sql loader
+oracle sql plus|oracle sql plus
+oracle weblogic server|oracle weblogic server
+packet filter software|packet filter software
+packet tracing software|packet tracing software
+pascal|pascal
+password management software|password management software
+patch management software|patch management software
+penetration testing software|penetration testing software
+pentaho kettle|pentaho kettle
+perforce helix software|perforce helix software
+perforce software|perforce software
+personal computer diagnostic software|personal computer diagnostic software
+phantomjs|phantomjs
+ping identity|ping identity
+portswigger burp suite|portswigger burp suite
+prolog|prolog
+putty|putty
+pyspark|pyspark
+qnx|qnx
+qualys cloud platform|qualys cloud platform
+quest bigbrother|quest bigbrother
+quest central|quest central
+quest erwin data modeler|quest erwin data modeler
+quest shareplex|quest shareplex
+rapid-i rapidminer|rapid-i rapidminer
+rapid7 nexpose|rapid7 nexpose
+react redux|react redux
+recovery testing software|recovery testing software
+recrystallize crystal reports|recrystallize crystal reports
+red hat ansible engine|red hat ansible engine
+red hat enterprise linux|red hat enterprise linux
+red hat openshift|red hat openshift
+red hat wildfly|red hat wildfly
+redgate sql server|redgate sql server
+regression testing software|regression testing software
+relational database management software|relational database management software
+remote control software|remote control software
+requirejs|requirejs
+requirements management software|requirements management software
+rest assured|rest assured
+restful api|restful api
+restructured extended executor rexx|restructured extended executor rexx
+revision control software|revision control software
+root kit detection software|root kit detection software
+ruby on rails|ruby on rails
+rust programming language|rust programming language
+safe software fme|safe software fme
+salesforce visualforce|salesforce visualforce
+sap adaptive server enterprise|sap adaptive server enterprise
+sap business intelligence|sap business intelligence
+sap businessobjects desktop intelligence|sap businessobjects desktop intelligence
+sap erp|sap erp
+sap netweaver bw|sap netweaver bw
+sap netweaver|sap netweaver
+sap powerbuilder|sap powerbuilder
+sap powerdesigner|sap powerdesigner
+sap replication server|sap replication server
+scriptella|scriptella
+secure shell ssh software|secure shell ssh software
+security incident management software|security incident management software
+security testing software|security testing software
+sentryone sql sentry|sentryone sql sentry
+shell script|shell script
+single sign-on sso|single sign-on sso
+sitecore cms|sitecore cms
+smalltalk|smalltalk
+smsi twister data integrator|smsi twister data integrator
+software distribution management software|software distribution management software
+software distribution software|software distribution software
+software libraries|software libraries
+solarwinds|solarwinds
+source code editor software|source code editor software
+splunk enterprise|splunk enterprise
+spring framework|spring framework
+stac software reachout|stac software reachout
+static analysis software|static analysis software
+storage management software|storage management software
+stress testing software|stress testing software
+structured query report sqr|structured query report sqr
+superanova|superanova
+symantec pcanywhere|symantec pcanywhere
+symantec visual cafe|symantec visual cafe
+system testing software|system testing software
+talend big data integration|talend big data integration
+talend data fabric|talend data fabric
+talend open studio|talend open studio
+tenable nessus|tenable nessus
+test data generator software|test data generator software
+test design software|test design software
+test implementation software|test implementation software
+transact-sql|transact-sql
+ubuntu|ubuntu
+unified modeling language uml|unified modeling language uml
+unistat statistical package|unistat statistical package
+unit testing software|unit testing software
+unix shell|unix shell
+usability testing software|usability testing software
+vector database software|vector database software
+veritas netbackup|veritas netbackup
+version control software|version control software
+virus scanning software|virus scanning software
+visible razor|visible razor
+vmware esx server|vmware esx server
+vmware|vmware
+web application framework software|web application framework software
+web application software|web application software
+web server software|web server software
+websense data loss prevention|websense data loss prevention
+win ce|win ce
+wind river vxworks|wind river vxworks
+wisdomforce databasesync system|wisdomforce databasesync system
+workflow software|workflow software
+xcode|xcode
+xml path language xpath|xml path language xpath
+zabbix|zabbix
+zend framework|zend framework

@@ -1,0 +1,154 @@
+electrical wiring
+electrical installation
+electrical troubleshooting
+electrical maintenance
+electrical panel installation
+electrical code compliance
+National Electrical Code|NEC
+electrical blueprint reading
+electrical schematics
+electrical testing
+conduit installation
+conduit bending
+cable pulling
+wire termination
+low-voltage wiring
+high-voltage systems
+motor controls
+motor control circuits
+electrical grounding
+circuit breaker installation
+transformer installation
+switchgear maintenance
+power distribution
+lighting installation
+fire alarm systems
+security system installation
+industrial electrical systems
+PLC troubleshooting
+control panel wiring
+instrumentation and controls|I&C
+building automation systems|BAS
+HVAC installation
+HVAC troubleshooting
+refrigeration systems
+pipefitting
+plumbing installation
+plumbing repair
+blueprint reading
+construction drawings
+building codes
+construction safety
+OSHA compliance
+scaffold safety
+fall protection
+lockout tagout|LOTO
+confined space safety
+hazard communication|HazCom
+job hazard analysis|JHA
+site safety inspections
+construction site management
+construction scheduling
+quantity takeoff
+construction estimating
+cost estimation
+material takeoff
+concrete placement
+concrete finishing
+formwork installation
+masonry
+bricklaying
+carpentry
+finish carpentry
+framing
+drywall installation
+drywall finishing
+roofing
+welding
+MIG welding
+TIG welding
+stick welding
+pipe welding
+welding inspection
+metal fabrication
+sheet metal fabrication
+structural steel erection
+rigging
+crane operation
+heavy equipment operation
+excavation
+earthmoving
+surveying
+land surveying
+total station surveying
+laser level operation
+concrete testing
+soil compaction testing
+quality control construction
+construction inspection
+preventive maintenance
+industrial maintenance
+mechanical troubleshooting
+millwright
+machining
+CNC machining
+CNC programming
+lathe operation
+milling machine operation
+hydraulic systems
+pneumatic systems
+pump maintenance
+boiler operation
+generator maintenance
+HVAC controls
+building maintenance
+facilities maintenance
+equipment repair
+maintenance work orders
+work order management
+preventive maintenance planning
+hazardous energy control
+electrical safety
+arc flash safety
+personal protective equipment|PPE
+NFPA 70E
+electrical commissioning
+system commissioning
+industrial safety
+cable termination
+commercial electrical wiring
+control panel assembly
+electrical panel wiring
+fire alarm installation
+grounding and bonding
+industrial electrical wiring
+industrial motor controls
+lighting control systems
+low voltage wiring
+motor installation
+motor maintenance
+nec compliance
+residential electrical wiring
+relay logic
+schematic interpretation
+variable frequency drives
+vfd programming
+wire pulling
+wiring diagram interpretation
+access control installation
+circuit breaker testing
+energy isolation
+panelboard installation
+plc programming
+electrical code interpretation
+electrical conduit installation
+electrical motor troubleshooting
+generator installation
+industrial electrical maintenance
+power quality analysis
+residential electrical installation
+electrical plan reading
+grounding system installation
+electrical maintenance planning
+residential generator installation
+electrical load calculation

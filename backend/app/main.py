@@ -23,6 +23,7 @@ from app.preprocess import (
     scrub_pii,
     split_sections,
     years_experience,
+    strip_invisible_unicode,
 )
 from app.schemas import (
     AnalyzeResponse,
@@ -31,10 +32,10 @@ from app.schemas import (
     ScoreBreakdown,
 )
 from app.scoring import (
-    combine,
+    combine_with_signal,
+    evidence_weighted_coverage,
     load_calibrator,
     section_fit_score,
-    skill_coverage,
     topk_mean,
 )
 from app.skills import (
@@ -42,7 +43,11 @@ from app.skills import (
     load_skills,
     noun_phrases,
     semantic_skill_matches,
+    skill_weights,
+    technical_skills,
 )
+from app.requirements import extract_unlisted_requirements
+from app.skill_context import domain_allows, domains_from_skills
 
 log = logging.getLogger("screener")
 ALLOWED_TYPES = {
@@ -283,8 +288,8 @@ async def _score_text(
         line for line in raw_text.splitlines()
         if not name_key or line.strip().casefold() != name_key
     )
-    text = scrub_pii(scoring_text)
-    jd_clean = scrub_pii(jd)
+    text = scrub_pii(strip_invisible_unicode(scoring_text))
+    jd_clean = scrub_pii(strip_invisible_unicode(jd))
     sections = split_sections(text)
     chunks = all_chunks(
         sections, chunk_size, settings.chunk_overlap, token_counter
@@ -294,11 +299,34 @@ async def _score_text(
     )
     if not jd_chunks:
         jd_chunks = [jd_clean] if jd_clean else []
-    jd_skills = extract_lexical(jd_clean, lexicon)
-    resume_skills = extract_lexical(text, lexicon)
-    resume_set = set(resume_skills)
+    jd_all_skills = extract_lexical(jd_clean, lexicon)
+    jd_skill_weights = skill_weights(jd_clean, lexicon)
+    hard_skill_count = len(jd_skill_weights)
+    jd_soft_skills = [
+        skill for skill in jd_all_skills
+        if lexicon.skill_types.get(skill) == "soft"
+    ]
+    if hard_skill_count < settings.min_hard_skills:
+        for skill in jd_soft_skills:
+            jd_skill_weights.setdefault(skill, 0.5)
+    jd_skills = list(jd_skill_weights)
+    jd_domains = domains_from_skills(jd_clean, jd_all_skills, lexicon)
+    resume_skills = technical_skills(
+        extract_lexical(text, lexicon), lexicon
+    )
+    resume_set = set(extract_lexical(text, lexicon))
     lexical = [s for s in jd_skills if s in resume_set]
     unmatched = [s for s in jd_skills if s not in resume_set]
+    semantic_unmatched = [
+        skill for skill in unmatched
+        if (
+            lexicon.skill_types.get(skill, "hard") == "hard"
+            and domain_allows(skill, jd_domains, lexicon)
+        )
+    ]
+    unlisted_requirements = extract_unlisted_requirements(
+        jd_clean, lexicon
+    )
     phrases = [
         phrase for phrase in noun_phrases(text)
         if extract_lexical(phrase, lexicon)
@@ -308,16 +336,21 @@ async def _score_text(
             sections.get("experience"), sections.get("projects"),
         ) if p
     )
+    section_text = exp_proj or text
     exp_chunks = chunk_text(
-        exp_proj, chunk_size, settings.chunk_overlap, token_counter
-    ) if exp_proj else []
+        section_text, chunk_size, settings.chunk_overlap, token_counter
+    ) if section_text else []
     resume_texts = [c[1] for c in chunks]
-    batch = jd_chunks + resume_texts + exp_chunks + jd_skills + phrases
+    batch = (
+        jd_chunks + resume_texts + exp_chunks + jd_skills + phrases
+        + unlisted_requirements
+    )
     emb = await encode_texts(model, batch)
     n_jd, n_res, n_exp = (
         len(jd_chunks), len(resume_texts), len(exp_chunks),
     )
     n_sk, n_ph = len(jd_skills), len(phrases)
+    n_req = len(unlisted_requirements)
     i = 0
     jd_emb = emb[i:i + n_jd]
     i += n_jd
@@ -328,13 +361,15 @@ async def _score_text(
     skill_emb = emb[i:i + n_sk]
     i += n_sk
     phrase_emb = emb[i:i + n_ph]
-    unmatched_idx = [jd_skills.index(s) for s in unmatched]
+    i += n_ph
+    requirement_emb = emb[i:i + n_req]
+    unmatched_idx = [jd_skills.index(s) for s in semantic_unmatched]
     un_emb = (
         skill_emb[unmatched_idx]
         if unmatched_idx and skill_emb.size else np.zeros((0, 1))
     )
     sem_hits = semantic_skill_matches(
-        unmatched, phrases, un_emb, phrase_emb,
+        semantic_unmatched, phrases, un_emb, phrase_emb,
         settings.skill_cosine_threshold,
         lexicon,
     )
@@ -347,6 +382,7 @@ async def _score_text(
     missing = [s for s in jd_skills if s not in matched_set]
     skill_scores = {s: 1.0 for s in lexical}
     skill_cosines: dict[str, float] = {}
+    sim = np.zeros((0, 0), dtype=np.float32)
     for skill, score in sem_hits:
         skill_scores[skill] = max(skill_scores.get(skill, 0.0), score)
     if skill_emb.size and res_emb.size:
@@ -356,16 +392,73 @@ async def _score_text(
             skill_scores[skill] = max(
                 skill_scores.get(skill, 0.0), skill_cosines[skill]
             )
+    evidence_by_section = {
+        "experience": settings.experience_skill_weight,
+        "projects": settings.project_skill_weight,
+        "skills": settings.skills_skill_weight,
+        "summary": settings.summary_skill_weight,
+        "education": settings.education_skill_weight,
+        "extras": settings.other_skill_weight,
+        "other": settings.other_skill_weight,
+    }
+    skill_evidence: dict[str, float] = {}
+    for section_name, section_text in sections.items():
+        location_weight = evidence_by_section.get(
+            section_name, settings.other_skill_weight
+        )
+        for skill in extract_lexical(section_text, lexicon):
+            if skill not in jd_skill_weights:
+                continue
+            skill_evidence[skill] = max(
+                skill_evidence.get(skill, 0.0), location_weight
+            )
+    for skill, _score in sem_hits:
+        if skill in skill_evidence or not sim.size:
+            continue
+        skill_index = jd_skills.index(skill)
+        chunk_index = int(sim[skill_index].argmax())
+        section_name = chunks[chunk_index][0]
+        skill_evidence[skill] = evidence_by_section.get(
+            section_name, settings.other_skill_weight
+        )
     raw_sem = topk_mean(res_emb, jd_emb, k=3)
-    skills_s = skill_coverage(len(matched), len(jd_skills))
+    matched_evidence = {
+        skill: skill_evidence.get(skill, 0.0) for skill in matched
+    }
+    skills_s = evidence_weighted_coverage(
+        jd_skill_weights, matched_evidence
+    )
+    requirement_scores: list[float] = []
+    if requirement_emb.size and res_emb.size:
+        requirement_sim = requirement_emb @ res_emb.T
+        requirement_scores = [
+            float(np.clip(row.max(), 0.0, 1.0))
+            for row in requirement_sim
+        ]
+    else:
+        requirement_scores = [0.0] * n_req
+    if requirement_scores:
+        known_weight = sum(jd_skill_weights.values())
+        requirement_weight = 0.5 * len(requirement_scores)
+        skills_s = (
+            skills_s * known_weight
+            + 0.5 * sum(requirement_scores)
+        ) / (known_weight + requirement_weight)
     jd_vec = mean_pool(jd_emb)
     sec_vec = mean_pool(exp_emb)
     section_s = section_fit_score(jd_vec, sec_vec)
-    parts = combine(
+    hard_matched_count = sum(
+        lexicon.skill_types.get(skill, "hard") == "hard"
+        for skill in matched
+    )
+    parts = combine_with_signal(
         raw_sem,
         skills_s,
         section_s,
         settings,
+        hard_skill_count,
+        len(jd_soft_skills),
+        hard_matched_count,
         getattr(app.state, "calibrator", None),
     )
     best_section = _best_section(chunks, res_emb, jd_emb)
@@ -399,12 +492,9 @@ async def _score_text(
     if not include_debug:
         return result
 
-    semantic_support = 0.5 + 0.5 * float(np.sqrt(skills_s))
-    weighted_semantic = (
-        settings.semantic_weight * parts.semantic * semantic_support
-    )
-    weighted_skills = settings.skill_weight * skills_s
-    weighted_section_fit = settings.section_weight * section_s
+    weighted_semantic = parts.semantic_weight * parts.semantic
+    weighted_skills = parts.skill_weight * skills_s
+    weighted_section_fit = parts.section_weight * section_s
     pre_clipped = (
         weighted_semantic + weighted_skills + weighted_section_fit
     )
@@ -432,6 +522,7 @@ async def _score_text(
             if body
         },
         "jd_skills": jd_skills,
+        "jd_soft_skills": jd_soft_skills,
         "matched_skills": {
             "lexical": [
                 {
@@ -459,28 +550,44 @@ async def _score_text(
             for index in top_chunk_indices
         ],
         "raw_semantic": raw_sem,
-        "calibrated_semantic": parts.semantic,
+        "calibrated_semantic": parts.calibrated_semantic,
+        "linear_semantic": parts.semantic,
+        "jd_skill_weights": jd_skill_weights,
+        "unlisted_requirements": [
+            {
+                "label": "unlisted requirements",
+                "requirement": phrase,
+                "similarity": score,
+                "credit": 0.5 * score,
+            }
+            for phrase, score in zip(
+                unlisted_requirements, requirement_scores
+            )
+        ],
+        "limited_skill_signal": parts.limited_skill_signal,
+        "skill_evidence_weights": matched_evidence,
         "skills_coverage": skills_s,
         "section_fit": section_s,
         "weights": {
-            "semantic": settings.semantic_weight,
-            "skills": settings.skill_weight,
-            "section_fit": settings.section_weight,
+            "semantic": parts.semantic_weight,
+            "skills": parts.skill_weight,
+            "section_fit": parts.section_weight,
         },
         "formula": {
-            "semantic_support": semantic_support,
             "weighted_semantic": weighted_semantic,
             "weighted_skills": weighted_skills,
             "weighted_section_fit": weighted_section_fit,
             "pre_clipped_score": pre_clipped,
             "final_score": parts.final,
+            "hard_skill_penalty": parts.hard_skill_penalty,
+            "limited_skill_signal": parts.limited_skill_signal,
             "match_percentage": parts.match_percentage,
             "expression": (
                 "round(100 * clip("
-                "semantic_weight * calibrated_semantic * "
-                "(0.5 + 0.5 * sqrt(skills_coverage)) + "
+                "semantic_weight * linear_semantic + "
                 "skill_weight * skills_coverage + "
-                "section_weight * section_fit, 0, 1))"
+                "section_weight * section_fit, 0, 1) * "
+                "hard_skill_penalty)"
             ),
         },
         "status": result.status,

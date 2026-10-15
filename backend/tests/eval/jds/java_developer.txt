@@ -1,0 +1,5 @@
+Java Developer
+Build backend services with Java, Spring Boot, REST APIs, SQL, Git,
+Docker, Kubernetes, and AWS. Write unit tests, review code, troubleshoot
+production issues, and collaborate with product teams. Problem solving
+and communication are required.

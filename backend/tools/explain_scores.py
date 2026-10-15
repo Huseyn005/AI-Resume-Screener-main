@@ -16,7 +16,8 @@ from app.config import FINETUNED_DIR, get_settings  # noqa: E402
 from app.embed import load_model, model_name  # noqa: E402
 from app.extract import extract_pdf  # noqa: E402
 from app.scoring import load_calibrator  # noqa: E402
-from app.skills import load_skills  # noqa: E402
+from app.skills import extract_lexical, load_skills  # noqa: E402
+from app.skill_context import domains_from_skills  # noqa: E402
 
 
 def parse_args() -> argparse.Namespace:
@@ -29,6 +30,11 @@ def parse_args() -> argparse.Namespace:
         "--no-calibrator",
         action="store_true",
         help="Use the linear semantic fallback instead of the calibrator.",
+    )
+    parser.add_argument(
+        "--out",
+        type=Path,
+        help="Write all score explanations to a UTF-8 JSON file.",
     )
     return parser.parse_args()
 
@@ -52,15 +58,17 @@ async def run(args: argparse.Namespace) -> None:
     state = main.app.state
     marker = object()
     previous: dict[str, Any] = {}
+    lexicon = load_skills()
     for name, value in (
         ("model", model),
-        ("lexicon", load_skills()),
+        ("lexicon", lexicon),
         ("calibrator", calibrator),
     ):
         previous[name] = getattr(state, name, marker)
         setattr(state, name, value)
 
     try:
+        details = []
         for filename in paths:
             path = Path(filename)
             extracted = extract_pdf(
@@ -90,7 +98,22 @@ async def run(args: argparse.Namespace) -> None:
                     stub, True, settings, jd, extracted.text,
                     "PDF could not be scored.",
                 )
-            print(json.dumps(detail, indent=2, ensure_ascii=False))
+            found_skills = extract_lexical(jd, lexicon)
+            detail["detected_domains"] = sorted(
+                domains_from_skills(jd, found_skills, lexicon)
+            )
+            if detail.get("limited_skill_signal"):
+                detail["notes"] = ["limited skill signal"]
+            details.append(detail)
+        output = getattr(args, "out", None)
+        if output:
+            output.write_text(
+                json.dumps(details, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+        else:
+            for detail in details:
+                print(json.dumps(detail, indent=2, ensure_ascii=False))
     finally:
         for name, value in previous.items():
             if value is marker:

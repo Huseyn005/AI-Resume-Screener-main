@@ -1,0 +1,150 @@
+HACCP|hazard analysis critical control points
+food safety
+food sanitation
+food handling
+food hygiene
+mise en place
+knife skills
+knife handling
+food preparation|prepare ingredients
+menu planning|menu preparation
+menu development
+food costing
+recipe costing
+inventory control
+food inventory management
+allergen management|manage allergens
+allergen control
+cross contamination prevention
+temperature control
+food storage
+food labeling
+ServSafe
+sanitation procedures
+commercial kitchen operations
+line cooking
+grill cooking
+saute cooking|sauté cooking
+roasting
+braising
+poaching
+steaming
+deep frying
+pan frying
+sous vide
+butchery
+meat fabrication
+fish fabrication
+fish preparation
+vegetable preparation
+pastry production
+baking
+bread production
+cake decorating
+chocolate tempering
+plating
+portion control
+recipe development
+recipe standardization
+batch cooking
+bulk food production
+banquet catering
+catering operations
+food service operations
+restaurant operations
+front of house operations
+back of house operations
+point of sale system|POS system
+restaurant POS
+food cost control
+labor cost control
+yield management
+food waste reduction
+quality control
+kitchen safety
+fire safety
+equipment sanitation
+commercial kitchen equipment
+convection oven
+combi oven
+commercial fryer
+flat top grill
+charbroiler
+smoker operation
+espresso preparation
+barista skills
+coffee brewing
+beverage service
+wine service
+bar operations
+mixology
+cocktail preparation
+guest service
+table service
+reservation management
+food allergies
+dietary restrictions
+therapeutic diets
+nutrition planning
+recipe scaling
+production scheduling
+food production planning
+standard operating procedures|SOPs
+health inspection readiness
+food traceability
+food recall procedures
+food procurement
+vendor ordering
+receiving inspection
+FIFO inventory
+first in first out|FIFO
+walk-in cooler management
+freezer management
+food preservation
+fermentation
+pickling
+charcuterie
+garde manger
+breakfast production
+grill station
+saute station
+pantry station
+pastry station
+chef de partie
+food presentation
+culinary training
+breakfast cookery
+brunch service
+short order cooking
+griddle cooking
+stock preparation
+sauce preparation
+soup preparation
+vegetable cookery
+meat cookery
+seafood cookery
+food preservation techniques
+smoking and curing
+food dehydration
+gluten-free food preparation
+vegan food preparation
+vegetarian menu planning
+halal food preparation
+kosher food preparation
+allergen-free meal preparation
+food safety audit
+sanitation audit
+commercial food production
+institutional food service
+school food service
+hospital food service
+recipe testing
+food sensory evaluation
+kitchen workflow management
+production kitchen management
+culinary quality assurance
+food service purchasing
+food service cost analysis
+kitchen brigade management
+food temperature control
+food allergen safety

@@ -1,79 +1,57 @@
 # canonical|alias|alias
+typescript
 javascript|js|ecmascript
-typescript|ts
 python|py
 java
 kotlin
 swift
 go|golang
 rust
-ruby|rb
 php
 c
-c++|cpp|cplusplus
-c#|csharp|cs
 scala
 r
 matlab
 perl
 lua
-dart
 elixir
 haskell
 clojure
-objective-c|objc
-bash|shell
 powershell
 sql
-html|html5
 css|css3
 sass|scss
-less
 react|reactjs|react.js
-react native|react-native
-next.js|nextjs|next
+react native
+next.js|nextjs
 vue|vuejs|vue.js
 nuxt|nuxtjs
-angular|angularjs
 svelte|sveltekit
 solidjs
 ember
-backbone
 jquery
 redux
 mobx
 zustand
 graphql
-apollo
-relay
 rest|rest api|restful
 grpc
 websocket
-node.js|nodejs|node
-express|expressjs
+node.js|nodejs
 nestjs|nest.js
 fastapi
 django
 flask
-tornado
-pyramid
-rails|ruby on rails
 spring|spring boot
 laravel
 symfony
-asp.net|.net|dotnet
+asp.net|dotnet
 blazor
-gin
-fiber
 actix
-phoenix
-electron
 tauri
 flutter
 ionic
 xamarin
-android
-ios
 webpack
 vite
 rollup
@@ -94,15 +72,11 @@ junit
 testng
 docker
 kubernetes|k8s
-helm
 terraform
 ansible
-puppet
-chef
 vagrant
 packer
 nomad
-consul
 istio
 linkerd
 aws|amazon web services
@@ -136,7 +110,7 @@ redis
 memcached
 cassandra
 couchdb
-elasticsearch|elastic search
+elasticsearch
 opensearch
 solr
 neo4j
@@ -156,17 +130,15 @@ dbt
 prefect
 dagster
 flink
-beam|apache beam
 pandas
 numpy
 scipy
 scikit-learn|sklearn
-pytorch|torch
-tensorflow|tf
+pytorch
+tensorflow
 keras
 jax
-huggingface|hugging face
-transformers
+huggingface
 onnx
 mlflow
 kubeflow
@@ -179,7 +151,7 @@ spacy
 nltk
 opencv
 tableau
-power bi|powerbi
+power bi
 looker
 excel
 qlik
@@ -191,13 +163,8 @@ gitlab
 bitbucket
 jira
 confluence
-linear
-notion
-slack
 figma
-sketch
 adobe xd
-photoshop
 illustrator
 indesign
 after effects
@@ -211,13 +178,12 @@ wireframing
 interaction design
 visual design
 usability testing
-accessibility|a11y
 wcag
 agile
 scrum
 kanban
 devops
-cicd|ci/cd|ci cd
+cicd|ci/cd
 sre
 observability
 prometheus
@@ -227,12 +193,9 @@ new relic
 sentry
 elk|elk stack
 splunk
-linux
 unix
-windows
 macos
 nginx
-apache
 haproxy
 traefik
 oauth
@@ -243,8 +206,6 @@ ldap
 rbac
 oauth2
 ssl|tls
-https
-security
 owasp
 penetration testing
 burp suite
@@ -256,9 +217,7 @@ event driven
 domain driven design|ddd
 tdd
 bdd
-solid
 restful apis
-soap
 openapi|swagger
 postman
 insomnia
@@ -277,14 +236,12 @@ active directory
 okta
 auth0
 keycloak
-vault|hashicorp vault
 secrets manager
 iam
 vpc
 cdn
 load balancing
 dns
-http
 tcp
 udp
 websocket api
@@ -295,36 +252,25 @@ paas
 iaas
 saas
 edge computing
-blockchain
 solidity
-ethereum
 web3
-nft
 kubernetes operators
-argo cd|argocd
-flux
-jenkins
+argo cd
 github actions
 gitlab ci
 circleci
 travis ci
 teamcity
-bamboo
-make
 cmake
 bazel
 gradle
 maven
 pip
-poetry
 conda
 npm
-yarn
 pnpm
 pipenv
-composer
 nuget
-cargo
 go modules
 storybook
 chromatic
@@ -335,7 +281,6 @@ chakra ui
 ant design
 shadcn
 styled components
-emotion
 css modules
 bem
 responsive design
@@ -361,12 +306,9 @@ zendesk
 hubspot
 marketo
 mailchimp
-stripe
 braintree
-paypal
 twilio
 sendgrid
-segment
 mixpanel
 amplitude
 google analytics
@@ -380,13 +322,42 @@ stakeholder management
 project management
 leadership
 communication
-accounting
-finance
-recruiting
+collaboration
+creativity
+teamwork|soft
+adaptability|soft
+problem solving|soft
+critical thinking|soft
+interpersonal skills|soft
+attention to detail|soft
+time management
+customer focus
+work ethic
+patience
+empathy
+multitasking
+dependability
+reliability
+initiative
+organization
+organization skills
+active listening
+conflict resolution
+discretion
+integrity
+persuasion
+mentoring
+emotional intelligence
+flexibility
+stress management
+customer service orientation
+communication skills
+interpersonal communication
+cross-functional collaboration
+professionalism
 crm
 customer success
 data analysis
-statistics
 a/b testing|ab testing
 experimentation
 etl
@@ -432,27 +403,22 @@ redis cache
 cdn caching
 memcache
 varnish
-rabbit
 celery
 sidekiq
 rq
 bullmq
-temporal
 cadence
 airbyte
 fivetran
-stitch
 segment cdp
 snowplow
 dbt cloud
 great expectations
-soda
 monte carlo
 data quality
 feature engineering
 mlops
 llm
-rag
 embeddings
 vector database
 pinecone
@@ -463,7 +429,6 @@ faiss
 milvus
 pgvector
 prompt engineering
-fine-tuning
 lora
 quantization
 onnx runtime
@@ -475,24 +440,18 @@ distributed training
 kubernetes jobs
 batch processing
 stream processing
-real-time
 low latency
 high availability
 disaster recovery
-backup
 replication
 sharding
 partitioning
 cap theorem
-consistency
-acid
 indexing
 query optimization
 full text search
 autocomplete
 recommendation systems
-classification
-regression
 clustering
 nlp
 computer vision
@@ -504,11 +463,9 @@ anomaly detection
 reinforcement learning
 graph neural networks
 transformers models
-bert
 gpt
 llama
 mistral
-whisper
 stable diffusion
 gan
 autoencoder
@@ -519,7 +476,6 @@ random forest
 svm
 logistic regression
 linear regression
-k-means
 pca
 umap
 t-sne
@@ -541,26 +497,20 @@ waf
 ddos
 rate limiting
 api gateway
-kong
 apigee
 aws api gateway
 azure apim
 graphql federation
-apollo federation
 trpc
 htmx
 alpine.js
-stimulus
 hotwire
-turbo
 inertia
 livewire
 phoenix liveview
-remix
 gatsby
 astro
 eleventy
-hugo
 jekyll
 docusaurus
 markdown
@@ -569,7 +519,6 @@ cms
 contentful
 sanity
 strapi
-wordpress
 drupal
 shopify
 magento
@@ -580,7 +529,6 @@ composable commerce
 kafka streams
 ksql
 debezium
-cdc
 change data capture
 outbox pattern
 saga pattern
@@ -595,11 +543,9 @@ observability stack
 opentelemetry|otel
 jaeger
 zipkin
-tempo
 loki
 thanos
 victoriametrics
-cortex
 mimir
 kiali
 flagger
@@ -609,10 +555,8 @@ pulumi
 cdk8s
 kustomize
 skaffold
-tilt
 devspace
 minikube
-kind
 k3s
 rancher
 openshift
@@ -647,7 +591,6 @@ toml config
 ini
 dotenv
 direnv
-pre-commit
 husky
 lint-staged
 commitlint
@@ -657,29 +600,21 @@ nx
 turborepo
 lerna
 bazelisk
-pants
-buck
 gradle kotlin
 sbt
 leiningen
-mix
 hex
 rebar
 cabal
-stack
 opam
 dune
 nim
 zig
 vlang
-crystal
 ocaml
-f#|fsharp
 erlang
-julia
 fortran
 cobol
-assembly|asm
 verilog
 vhdl
 systemc
@@ -696,8 +631,6 @@ uikit
 jetpack compose
 xml layout
 constraint layout
-room
-realm
 core data
 sqlite.swift
 alamofire
@@ -706,23 +639,17 @@ retrofit
 okhttp
 volley
 glide
-coil
 picasso
 kingfisher
 sdwebimage
 rxjava
 rxswift
-combine
 coroutines
 async await
-promises
-futures
 tokio
 asyncio
-trio
 gevent
 eventlet
-twisted
 netty
 akka
 vert.x
@@ -734,33 +661,20 @@ grails
 sparkjava
 javalin
 ktor
-vapor
-perfect
 kitura
 hummingbird
 actix-web
 axum
-warp
-rocket
-tide
-hyper
 reqwest
 httpx
 aiohttp
-requests
 urllib
 beautifulsoup
 scrapy
 puppeteer
 cheerio
 jsdom
-happy-dom
-testing-library
-enzyme
-jasmine
-karma
 ava
-tap
 qunit
 phpunit
 rspec
@@ -778,41 +692,33 @@ jmeter
 k6
 locust
 wrk
-ab
-siege
 vegeta
 fortio
-hey
-boom
 autodesk
 revit
 autocad
 solidworks
 catia
 ansys
-matlab|matlab simulink
 labview
-plc|plcs|plc-based|plcs-based|programmable logic controller|programmable logic controllers|programmable-logic-controller|programmable-logic-controllers
+plc|plcs|plcs-based|programmable logic controller|programmable logic controllers|programmable-logic-controller|programmable-logic-controllers
 scada|supervisory control and data acquisition|supervisory control and data acquisition systems
 hmi|human machine interface|human machine interfaces|human-machine interface|human-machine interfaces
-dcs|distributed control system|distributed control systems|distributed-control-system|distributed-control-systems
+dcs|distributed control system|distributed control systems
 pid|pid controller|proportional integral derivative
 tia portal|siemens tia portal
+tia
 modbus
-profibus
-profinet
-opc ua
-instrumentation
+profibus|profibus dp|profibus-dp|profibus pa|profibus-pa
+profinet|profinet io|profinet-io
+opc ua|opc-ua
+instrumentation|instrument and control|i&c|field instruments|field instrumentation|transmitters
 control systems
 iot
 mqtt
 coap
 zigbee
-bluetooth
-wifi
-nfc
 rfid
-embedded
 rtos
 freertos
 zephyr
@@ -841,15 +747,12 @@ vcs
 design compiler
 primetime
 innovus
-encounter
 calibre
 drc
 lvs
 pex
-spice
 hspice
 spectre
-ads
 hfss
 cst
 comsol
@@ -857,11 +760,9 @@ nastran
 abaqus
 ls-dyna
 star-ccm
-fluent
 cfx
 openfoam
 paraview
-visit
 tecplot
 originlab
 gnuplot
@@ -871,23 +772,18 @@ plotly
 bokeh
 altair
 ggplot2
-shiny
 streamlit
 gradio
-dash
-panel
 voila
 jupyter
 colab
 kaggle
 databricks
 emr
-glue
 athena
 presto
 trino
 impala
-drill
 kylin
 druid
 pinot
@@ -899,12 +795,10 @@ hazelcast
 infinispan
 coherence
 ehcache
-caffeine
 guava
 apache commons
 lombok
 mapstruct
-jackson
 gson
 moshi
 kotlinx serialization
@@ -931,25 +825,19 @@ asyncapi
 raml
 api blueprint
 graphql schema
-apollo studio
 hasura
 postgraphile
 prisma graphql
 typegraphql
-nexus
 pothos
 relay modern
 urql
-apollo client
 tanstack query|react query
 swr
 rtk query
 axios
-ky
-got
 superagent
 undici
-fetch
 xmlhttprequest
 sse client
 mqtt.js
@@ -961,26 +849,20 @@ fastify
 hapi
 koa
 restify
-sails
 adonis
-meteor
-feathers
 loopback
 strapi plugin
 keystone
 payload cms
 directus
-ghost
 hugo modules
 eleventy plugin
 gatsby plugin
 next auth
-clerk
 supabase auth
 firebase auth
 cognito
 auth.js
-passport
 spring security
 django auth
 flask-login
@@ -996,11 +878,9 @@ idor
 cors
 csp
 hsts
-sri
 subresource integrity
 content security policy
 owasp top 10
-sans
 nist
 iso 27001
 soc 2
@@ -1010,14 +890,12 @@ hipaa
 pci dss
 fedramp
 cmmc
-sox
 itil
 cobit
 togaf
 zachman
 cmmi
 six sigma
-lean
 kaizen
 okrs
 kpis
@@ -1043,7 +921,6 @@ retrospectives
 standups
 backlog grooming
 story points
-velocity
 burndown
 burnup
 monte carlo forecast
@@ -1054,15 +931,10 @@ earned value
 risk matrix
 raid log
 stakeholder map
-persona
 journey map
 service blueprint
 empathy map
-jobs to be done
 kano
-moscow
-rice
-ice
 wsjf
 cost of delay
 value stream
@@ -1074,11 +946,9 @@ sli
 sla
 error budget
 toil
-on-call
 postmortem
 blameless
 incident commander
-severity
 p1
 p2
 p3
@@ -1091,7 +961,6 @@ developer experience
 inner source
 opensource
 oss
-licensing
 spdx
 sbom
 cyclonedx
@@ -1123,7 +992,6 @@ flake8
 ruff
 mypy
 pyright
-black
 isort
 autopep8
 yapf
@@ -1156,11 +1024,9 @@ misp
 thehive
 cortex soar
 splunk soar
-phantom
 demisto
 xsoar
 sentinel
-defender
 crowdstrike
 carbon black
 sentinelone
@@ -1193,9 +1059,7 @@ ltrace
 tcpdump
 tshark
 mitmproxy
-charles
 fiddler
-burpsuite
 owasp zap
 nikto
 sqlmap
@@ -1205,11 +1069,8 @@ hashcat
 aircrack
 metasploit
 cobalt strike
-empire
 sliver
-covenant
 mythic
-havoc
 bloodhound
 impacket
 responder
@@ -1230,36 +1091,26 @@ zerologon
 printnightmare
 log4shell
 spring4shell
-proxyLogon
+proxylogon
 proxyshell
 moveit
 citrixbleed
 heartbleed
 shellshock
 poodle
-beast
-crime
-breach
 lucky13
-freak
 logjam
-drown
 sweet32
-robot
 lucky thirteen
 bleichenbacher
 padding oracle
 timing attack
 side channel
-meltdown
 l1tf
 mds
 zombieload
 ridl
-fallout
 foreshadow
-downfall
-inception
 retbleed
 bhi
 aep
@@ -1292,7 +1143,6 @@ bloom filter
 cuckoo filter
 hyperloglog
 count-min sketch
-t-digest
 hdr histogram
 reservoir sampling
 consistent hashing
@@ -1343,10 +1193,8 @@ sunburst
 choropleth
 sparkline
 bullet chart
-gauge
 funnel
 cohort
-retention
 churn
 ltv
 cac
@@ -1358,7 +1206,6 @@ grr
 magic number
 rule of 40
 burn multiple
-runway
 gross margin
 contribution margin
 ebitda
@@ -1369,8 +1216,6 @@ dcf
 capex
 opex
 cogs
-sg&a
-r&d
 tco
 roi
 roa
@@ -1395,11 +1240,8 @@ deferred revenue
 accrual
 depreciation
 amortization
-impairment
-goodwill
 intangibles
 ppe
-inventory
 fifo
 lifo
 weighted average
@@ -1408,16 +1250,9 @@ variance analysis
 budgeting
 forecasting finance
 fp&a
-treasury
-fx
 hedging
-derivatives
-options
 swaps
-forwards
 black scholes
-greeks
-var
 cvar
 expected shortfall
 stress test
@@ -1431,12 +1266,10 @@ variational inference
 em algorithm
 gradient descent
 sgd
-adam
 rmsprop
 adagrad
 nadam
 lbfgs
-newton
 quasi newton
 conjugate gradient
 levenberg marquardt
@@ -1451,14 +1284,12 @@ duality
 convex optimization
 integer programming
 linear programming
-quadratic programming
 sdp
 admm
 proximal
 coordinate descent
 block coordinate
 coordinate ascent
-coordinate
 simulated annealing
 genetic algorithm
 pso
@@ -1473,13 +1304,8 @@ frank wolfe
 mirror descent
 natural gradient
 kfac
-shampoo
-sophia
-lion
 adafactor
-lamb
 lars
-sam
 sharpness
 mixup
 cutmix
@@ -1507,8 +1333,6 @@ diffgrad
 adabelief
 adamp
 madgrad
-apollo optimizer
-ranger
 over9000
 novograd
 qhadam
@@ -1519,7 +1343,6 @@ adaboundw
 adamw
 sgdw
 nesterov
-momentum
 heavy ball
 polyak momentum
 extragradient
@@ -1529,7 +1352,6 @@ gda
 wgan
 wgan-gp
 lsgan
-began
 ebgan
 infogan
 cyclegan
@@ -1541,7 +1363,7 @@ biggan
 stylegan2
 stylegan3
 eg3d
-gigaGAN
+gigagan
 sdxl
 controlnet
 ip-adapter
@@ -1554,9 +1376,7 @@ loha
 lokr
 ia3
 prefix tuning
-p-tuning
 prompt tuning
-adapter
 compacter
 bitfit
 diff pruning
@@ -1590,7 +1410,6 @@ parameter server
 allreduce
 allgather
 reducescatter
-broadcast
 p2p
 rdma
 infiniband
@@ -1625,9 +1444,7 @@ spiking
 snn
 event camera
 lidar
-radar
 imu
-slam
 visual odometry
 bundle adjustment
 sfm
@@ -1672,7 +1489,6 @@ google forms
 ms forms
 airtable
 smartsheet
-monday
 asana
 trello
 clickup
@@ -1685,7 +1501,6 @@ clarity ppm
 planview
 ado
 azure boards
-rally
 versionone
 targetprocess
 leankit
@@ -1702,19 +1517,14 @@ youtrack
 shortcut
 pivotal tracker
 clubhouse
-height
 coda
 roam
 obsidian
 logseq
-bear
 evernote
 onenote
-keep
 apple notes
-craft
 mem
-reflect
 heptabase
 tana
 workflowy
@@ -1737,7 +1547,7 @@ gliffy
 creately
 edraw
 smartdraw
-yEd
+yed
 graphviz
 plantuml
 mermaid
@@ -1759,25 +1569,19 @@ krita
 procreate
 clip studio
 zbrush
-substance
 marvelous designer
 houdini
-maya
 3ds max
 cinema 4d
 modo
 lightwave
-rhino
 grasshopper
 keyshot
 vray
 octane
-arnold
 renderman
-cycles
 eevee
 unreal engine
-unity
 godot
 source 2
 cryengine
@@ -1805,51 +1609,29 @@ arcore
 vuforia
 wikitude
 8th wall
-a-frame
 babylon.js
 playcanvas
 spline
 rive
 lottie
 after effects expressions
-cinema
-premiere
 final cut
 davinci resolve
-avid
-pro tools
-ableton
 logic pro
 fl studio
-cubase
-reaper
 audacity
-izotope
-fabfilter
-waves
 native instruments
 spl
-ssl
 neumann
 shure
 sennheiser
 audio-technica
-rode
 zoom h6
 fostex
 tascam
 sound devices
-field recorder
 lav
-shotgun mic
-foley
-adr
 dialog edit
-mastering
-loudness
-lufs
-true peak
-k-system
 aes
 ebu r128
 atsc
@@ -1857,33 +1639,21 @@ dolby
 dts
 atmos
 360 audio
-ambisonics
-binaural
 hrtf
 spatial audio
 object based audio
 channel based
-stem mastering
-izotope ozone
 neutron
 rx
-insight
 insight meters
-span
 youlean
 melda
 soothe
-pro-q
-pro-c
-pro-l
 valence
-saturn
-trash
 decapitator
 devil-loc
 la2a
 neve
-api
 ssl bus
 ssl channel
 ssl 4000
@@ -1900,31 +1670,14 @@ dbx
 empirical labs
 shadow hills
 cranesong
-shadow
 kush
-plugin alliance
-universal audio
-ua
-apollo interface
-twin
-arrow
-satellite
 octo
 hexa
-quad
-solo
-studio
-live
-push
 launchpad
 maschine
 komplete
 reaktor
 kontakt
-massive
-serum
-vital
-surge
 phase plant
 pigments
 diva
@@ -1936,8 +1689,6 @@ trinosphere
 trilian
 stylus
 rmx
-battery
-abbey
 addictive drums
 ezdrummer
 superior drummer
@@ -1959,23 +1710,17 @@ neural dsp
 tonex
 tonelib
 bias amp
-s-gear
 revalver
 lepou
 tse
 ml sound lab
-nam
 proteus
-captain
 captor
 suhr
 friedman
 bogner
-mesa
-marshall
 fender
 vox
-orange
 prs
 evh
 diezel
@@ -1983,27 +1728,22 @@ engl
 peavey
 laney
 blackstar
-victory
 revv
 fortin
 two notes
 torpedo
 wall of sound
-ir
 cab sim
 load box
 reactive load
 attenuator
 power soak
-weber
 rivera
 dr.z
 matchless
 bad cat
 tone king
 swart
-carr
-two-rock
 dumble
 trainwreck
 komet
@@ -2012,10 +1752,8 @@ supro
 silvertone
 danelectro
 gretsch
-gibson
 epiphone
 ibanez
-esp
 charvel
 schecter
 caparison
@@ -2024,68 +1762,39 @@ kiesel
 suhr guitar
 tom anderson
 music man
-sterling
 yamaha
 cort
 squier
-player
-american
 custom shop
-historic
-murphy
 reissue
-vintage
 relic
 heavy relic
 closet classic
 road worn
 thin skin
 nitro
-poly
 satin
 gloss
 relicing
-checking
 crazing
-fading
 yellowing
 patina
 oxidation
 corrosion
 pitting
-wear
 playwear
 fretwear
 refret
 level crown polish
-nut
-saddle
-bridge
 tremolo
-floyd
-wilkinson
 gotoh
 hipshot
 graph tech
 tusq
-bone
-fossil
-brass
-steel
-titanium
-stainless
-nickel
 pure nickel
-roundwound
-flatwound
 half round
-tapewound
-coated
-daddario
-ernie ball
 ghs
 dr strings
-stringjoy
 kalium
 thomastik
 la bella
@@ -2094,24 +1803,11 @@ cleartone
 optima
 s.i.t.
 dean markley
-martin
-elixir nanoweb
 elixir polyweb
 elixir optiweb
-elixir nanoweb 80/20
-elixir nanoweb phosphor
 martin sp
 martin sp coated
 martin authentic
-daddario xs
-daddario xt
-daddario nyxl
-daddario exp
-ernie ball paradigm
-ernie ball slinky
-ernie ball cobalt
-ernie ball m-steel
-ernie ball rps
 ghs boomers
 ghs progressives
 ghs thin core
@@ -2120,133 +1816,35 @@ dr hi-beam
 dr neon
 dr black beauties
 dr pure blues
-stringjoy foxwoods
-stringjoy signatur
 kalium balanced
 pyramid gold
 thomastik infeld
 thomastik jazz
 thomastik power bright
-la bella deep talkin
 rotosound swing bass
 rotosound stainless
 cleartone treated
 optima gold
 sit powerwound
-dean markley blue steel
-dean markley nickel steel
 martin flex
-daddario phosphor
 elixir 80/20
-elixir nanoweb light
-elixir nanoweb medium
-elixir nanoweb custom
-elixir nanoweb extra light
-elixir nanoweb super light
-elixir nanoweb light top heavy bottom
-elixir nanoweb 12-string
-elixir nanoweb bass
-elixir nanoweb mandolin
-elixir nanoweb banjo
-elixir nanoweb classical
-elixir nanoweb folk
-elixir nanoweb silk and steel
-elixir nanoweb 80/20 bronze
-elixir nanoweb phosphor bronze
-elixir nanoweb 80/20 light
-elixir nanoweb phosphor light
-elixir nanoweb 80/20 medium
-elixir nanoweb phosphor medium
-elixir nanoweb 80/20 custom light
-elixir nanoweb phosphor custom
-elixir nanoweb 80/20 extra light
-elixir nanoweb phosphor extra light
-elixir nanoweb 80/20 super light
-elixir nanoweb phosphor super light
-elixir nanoweb 80/20 12-string
-elixir nanoweb phosphor 12-string
-elixir nanoweb 80/20 light 12
-elixir nanoweb phosphor light 12
-elixir nanoweb 80/20 medium 12
-elixir nanoweb phosphor medium 12
-elixir nanoweb bass light
-elixir nanoweb bass medium
-elixir nanoweb bass extra light
-elixir nanoweb bass super light
-elixir nanoweb bass 5-string
-elixir nanoweb bass 6-string
-elixir nanoweb bass tapewound
-elixir nanoweb bass stainless
-elixir nanoweb bass nickel
-elixir nanoweb bass cobalt
-elixir nanoweb bass stainless light
-elixir nanoweb bass nickel light
-elixir nanoweb bass cobalt light
-elixir nanoweb bass stainless medium
-elixir nanoweb bass nickel medium
-elixir nanoweb bass cobalt medium
-elixir nanoweb bass stainless extra light
-elixir nanoweb bass nickel extra light
-elixir nanoweb bass cobalt extra light
-elixir nanoweb bass stainless super light
-elixir nanoweb bass nickel super light
-elixir nanoweb bass cobalt super light
-elixir nanoweb bass stainless 5
-elixir nanoweb bass nickel 5
-elixir nanoweb bass cobalt 5
-elixir nanoweb bass stainless 6
-elixir nanoweb bass nickel 6
-elixir nanoweb bass cobalt 6
-elixir nanoweb bass tapewound light
-elixir nanoweb bass tapewound medium
-elixir nanoweb bass tapewound extra light
-elixir nanoweb bass tapewound super light
-elixir nanoweb bass tapewound 5
-elixir nanoweb bass tapewound 6
-elixir nanoweb bass stainless tapewound
-elixir nanoweb bass nickel tapewound
-elixir nanoweb bass cobalt tapewound
-elixir nanoweb bass stainless tapewound light
-elixir nanoweb bass nickel tapewound light
-elixir nanoweb bass cobalt tapewound light
-elixir nanoweb bass stainless tapewound medium
-elixir nanoweb bass nickel tapewound medium
-elixir nanoweb bass cobalt tapewound medium
-elixir nanoweb bass stainless tapewound extra
-elixir nanoweb bass nickel tapewound extra
-elixir nanoweb bass cobalt tapewound extra
-elixir nanoweb bass stainless tapewound super
-elixir nanoweb bass nickel tapewound super
-elixir nanoweb bass cobalt tapewound super
-elixir nanoweb bass stainless tapewound 5
-elixir nanoweb bass nickel tapewound 5
-elixir nanoweb bass cobalt tapewound 5
-elixir nanoweb bass stainless tapewound 6
-elixir nanoweb bass nickel tapewound 6
-elixir nanoweb bass cobalt tapewound 6
 linux kernel
 posix
 systemd
 openrc
 runit
 s6
-supervisor
 monit
-circus
 honcho
-foreman
 overmind
 hivemind
-god
 bluepill
 monitrc
 cron
 anacron
-at
 systemd timer
 launchd
 task scheduler
-quartz
 apscheduler
 celery beat
 django-q
@@ -2259,14 +1857,12 @@ procrastinate
 django-rq
 rq-scheduler
 aps
-schedule
 timeloop
 airflow dag
 luigi
 pinball
 azkaban
 oozie
-ni-fi
 nifi
 streamsets
 pentaho
@@ -2280,13 +1876,12 @@ dataprep
 dataproc
 dataflow
 cloud composer
-mwAA
+mwaa
 managed airflow
 astronomer
 google composer
 azure data factory
 synapse
-fabric
 power query
 dax
 ssas
@@ -2298,7 +1893,6 @@ extract refresh
 prep builder
 prep conductor
 data management
-catalog
 collibra
 alation
 atlan
@@ -2348,17 +1942,14 @@ mpnet
 e5
 bge
 gte
-instructor
 nomic
 jina
 cohere embed
 openai embed
-voyage
 gemini embed
 titan embed
 bedrock
 anthropic
-claude
 gpt-4
 gpt-3.5
 o1
@@ -2375,12 +1966,6 @@ qwen
 qwen2
 deepseek
 gemma
-phi
-phi-3
-phi-4
-yi
-solar
-command
 jamba
 dbrx
 grok
@@ -2388,17 +1973,11 @@ inflection
 reka
 ai21
 j2
-jurassic
-titan
-nova
 olympus
 cohere
 ai21 labs
-together
-fireworks
 anyscale
 modal
-replicate
 huggingface inference
 sagemaker endpoint
 vertex endpoint
@@ -2418,17 +1997,12 @@ voltage park
 fluidstack
 hyperstack
 tensordock
-salad
-vast
 runpod serverless
 modal labs
 beam.cloud
 baseten
-banana
 cerebrium
-lightning ai
 grid.ai
-determined
 polyaxon
 kubeflow pipelines
 vertex pipelines
@@ -2462,16 +2036,12 @@ dbt-utils
 dbt-expectations
 dbt-audit-helper
 dbt-project-evaluator
-elementary
 re_data
 metaplane
 bigeye
 anomalo
 lightup
 acceldata
-owl
-montecarlo
-great-expectations
 soda core
 soda cloud
 ge checkpoints
@@ -2485,7 +2055,6 @@ schema
 jsonschema
 openapi validation
 zod
-yup
 joi
 ajv
 typebox
@@ -2496,11 +2065,9 @@ runtypes
 effect schema
 arktype
 typia
-ts-pattern
 neverthrow
 fp-ts
 purify-ts
-true-myth
 oxide.ts
 remeda
 radash
@@ -2512,12 +2079,9 @@ immutable
 immer
 mutative
 structura
-optics
 monocle
 partial.lenses
-shades
 ramda-lens
-sanctuary
 crocks
 folktale
 daggy
@@ -2528,29 +2092,17 @@ algebraic data types
 hkts
 higher kinded
 typeclasses
-functor
 applicative
-monad
 monoid
 semigroup
 foldable
 traversable
-profunctor
-contravariant
-bifunctor
-alt
-plus
-alternative
-monaderror
 mtl
-free monad
 cofree
-comonad
 kleisli
 yoneda
 coyoneda
 codensity
-continuation
 codata
 corecursion
 anamorphism
@@ -2566,11 +2118,8 @@ elgot
 mutumorphism
 adjunction
 kan extension
-end
 coend
-limit
 colimit
-product
 coproduct
 equalizer
 coequalizer
@@ -2580,7 +2129,6 @@ exponential
 topos
 sheaf
 presheaf
-site
 grothendieck
 fibered
 indexed
@@ -2591,28 +2139,21 @@ observational
 intensional
 extensional
 univalence
-hit
 higher inductive
 path types
 identity types
 j rule
-transport
 subst
 cong
 rewrite
-cast
 coerce
 unsafe coerce
 transfinite
 ordinal
-cardinal
-accessible
 locally presentable
 locally cartesian
-slice
 comma
 arrow category
-functor category
 presheaf category
 sheaf topos
 elementary topos
@@ -2622,69 +2163,36 @@ quasi category
 simplicial
 complete segal
 segal space
-complete
-css
-replacing
 model category
 quillen
-derived
 triangulated
-stable
 spectra
 ring spectra
-e-infinity
-a-infinity
 operad
-prop
 multicategory
-enriched
-internal
 double category
-virtual
 fc-multicategory
 virtual double
 proarrow
-equipment
 framed bicategory
 psb
-psuedofunctor
-lax
-oplax
-colax
-strong
-strict
-normal
-unital
 associative
 braided
 symmetric
-balanced
-ribbon
-sovereign
 compact closed
-traced
-compact
-closed
 monoidal
 cartesian monoidal
 cocartesian
 semicartesian
 affine
-relevant
-ordered
 relevant logic
 linear logic
 ordered logic
 bunched
-separation
 concurrent separation
 rely guarantee
-views
 permissions
 fractional
-counting
-token
-capability
 object capability
 macaroons
 spiffe
@@ -2693,9 +2201,7 @@ workload identity
 identity federation
 scim
 just in time
-pam
 pim
-privileged
 break glass
 emergency access
 step up
@@ -2711,7 +2217,6 @@ push notification
 sms otp
 email otp
 backup codes
-recovery
 hardware key
 yubikey
 titan key
@@ -2719,34 +2224,18 @@ solokey
 nitrokey
 onlykey
 ledger
-trezor
-coldcard
-bitbox
-foundation
 krux
 seedsigner
 specter
 sparrow
-electrum
-bluewallet
 breez
 muun
-zeus
-zeusln
 alby
 lnbits
 lnd
 cln
 eclair
 ldk
-core lightning
-c-lightning
-lightning
-bolt
-bolt11
-bolt12
-offers
-amp
 keysend
 sphinx
 trampoline
@@ -2756,8 +2245,6 @@ wumbo
 large channels
 dual funded
 splicing
-submarine
-loop
 boltz
 fixed float
 sideshift
@@ -2766,12 +2253,8 @@ shapeshift
 thorswap
 rango
 lifi
-socket
 bungee
-jumper
-across
 stargate
-hop
 connext
 celer
 multichain
@@ -2781,9 +2264,6 @@ layerzero
 axelar
 hyperlane
 ibc
-peggy
-gravity
-noble
 circle cctp
 usdc
 usdt
@@ -2799,19 +2279,12 @@ pyusd
 crvusd
 gho
 aave
-compound
-maker
-sky
 spark protocol
 morpho
 euler
 silo
-fluid
 kamino
 solend
-mango
-drift
-jupiter
 orca
 raydium
 meteora
@@ -2824,7 +2297,6 @@ invariant
 cropper
 tulip
 francium
-port
 solend lite
 apricot
 larix
@@ -2850,8 +2322,6 @@ lido
 rocket pool
 stakewise
 frax eth
-swell
-origin
 ankr
 stader
 ssv
@@ -2889,13 +2359,10 @@ plonk
 plonky2
 plonky3
 halo2
-halo
 super nova
 hyper nova
-folding
 ivc
 pcd
-accumulation
 protogalaxy
 sangria
 hyperplonk
@@ -2903,7 +2370,6 @@ ultrahonk
 honk
 mega honk
 barretenberg
-bb
 aztec
 noir
 circom
@@ -2921,7 +2387,6 @@ p384
 bls12-381
 bn254
 bn256
-pasta
 pallas
 vesta
 bw6
@@ -2940,7 +2405,6 @@ oss wu
 icart
 fouque tibouchi
 wahby boneh
-shallue van de woestijne
 simplified swu
 indifferentiable
 random oracle
@@ -2949,16 +2413,12 @@ forking
 rewinding
 special soundness
 knowledge soundness
-simulation
 zero knowledge
 honest verifier
 statistical zk
 computational zk
 perfect zk
-adaptive
 non adaptive
-malicious
-honest
 crs
 srs
 toxic waste
@@ -2976,7 +2436,6 @@ penumbra
 namada
 anoma
 taiga
-orchard
 sapling
 sprout
 zcash
@@ -2987,43 +2446,26 @@ nighthawk
 zashi
 ywallet
 unstoppable
-edge
-exodus
-trust
-metamask
 rabby
-rainbow
-frame
 rabby wallet
-core
 okx
-binance
 coinbase wallet
-backpack
 solflare
-glow
-slope
 exodus sol
 brave wallet
-opera
 keplr
-leap
 cosmostation
-station
 xdefi
 ctrl
-frontier
 math wallet
 imtoken
 tokenpocket
 safepal
 ledger live
-trezor suite
 gridplus
 lattice
 fireblocks
 bitgo
-copper
 anchorage
 coinbase custody
 gemini custody
@@ -3043,23 +2485,11 @@ valkyrie
 21shares
 etc group
 coinshares
-purpose
 ci galaxy
-evolve
 horizons
-harvest
-beta
 ninepoint
-purpose bitcoin
 purpose ethereum
-ishares bitcoin
 ishares ethereum
-bitwise bitcoin
-vaneck bitcoin
-proshares bitcoin
-valkyrie bitcoin
-21shares bitcoin
-grayscale bitcoin
 gbtc
 ethe
 btco
@@ -3073,51 +2503,34 @@ btcw
 ezbc
 btc
 eth
-sol
 bnb
 xrp
-ada
 doge
-ton
 trx
 avax
 shib
-dot
-link
 matic
 wbtc
-uni
 ltc
 bch
-atom
-etc
 xlm
-near
 icp
 fil
-apt
 sui
 sei
-tia
 inj
-op
 arb
 mnt
-blast
 linea
-scroll
 zksync
 starknet
 polygon zk
 ronin
-flow
 egld
 algo
 xtz
 eos
-neo
 qtum
-vet
 theta
 tfuel
 kas
@@ -3131,7 +2544,6 @@ dcr
 rvn
 hnt
 iotx
-hot
 ankr token
 gno
 rpl
@@ -3139,7 +2551,6 @@ fxs
 crv
 cvx
 bal
-aura
 ldo
 reth
 steth
@@ -3156,27 +2567,26 @@ weeth
 eeth
 ethx
 mpeth
-mETH
-unshETH
-lsETH
-ankrETH
-stMATIC
-stSOL
-mSOL
-jitoSOL
-bSOL
-scnSOL
-cgSOL
-daoSOL
-eSOL
-stepSOL
-laineSOL
-vSOL
-jsSOL
-pSOL
-aSOL
-hSOL
-qSOL
-xSOL
-ySOL
-zSOL
+unsheth
+lseth
+ankreth
+stmatic
+stsol
+msol
+jitosol
+bsol
+scnsol
+cgsol
+daosol
+esol
+stepsol
+lainesol
+vsol
+jssol
+psol
+asol
+hsol
+qsol
+xsol
+ysol
+zsol

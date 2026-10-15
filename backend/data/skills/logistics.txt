@@ -1,0 +1,151 @@
+commercial driving
+commercial driver's license|CDL
+Class A CDL
+Class B CDL
+commercial vehicle operation
+truck driving
+tractor-trailer operation
+defensive driving
+pre-trip inspection
+post-trip inspection
+vehicle inspection
+hours of service compliance|HOS compliance
+electronic logging device|ELD
+DOT compliance
+FMCSA compliance
+route planning
+route optimization
+delivery scheduling
+last-mile delivery
+freight transportation
+freight dispatch
+load planning
+cargo securement
+load securement
+hazmat transportation
+hazardous materials handling|HAZMAT
+refrigerated transportation
+temperature-controlled transport
+logbook management
+bill of lading
+proof of delivery
+delivery documentation
+fleet management
+fleet maintenance coordination
+vehicle maintenance
+fuel management
+defensive driving instruction
+warehouse operations
+warehouse management system|WMS
+warehouse inventory management
+inventory control
+inventory cycle counting
+inventory reconciliation
+receiving and putaway
+order picking
+pick and pack
+packing and shipping
+shipping and receiving
+forklift operation
+powered industrial truck operation
+forklift certification
+pallet jack operation
+reach truck operation
+order fulfillment
+distribution center operations
+cross-docking
+goods movement
+material handling
+conveyor operations
+loading dock operations
+shipping documentation
+freight documentation
+freight classification
+freight brokerage
+transportation management system|TMS
+SAP Transportation Management
+Manhattan WMS
+Oracle WMS
+warehouse slotting
+warehouse labor planning
+warehouse safety
+OSHA warehouse safety
+inventory replenishment
+stock rotation
+FIFO inventory
+LIFO inventory
+reverse logistics
+returns logistics
+procurement logistics
+supply chain coordination
+supply chain planning
+transportation planning
+freight cost analysis
+carrier management
+carrier tendering
+freight claims
+customs documentation
+customs brokerage
+import export documentation
+international shipping
+container loading
+intermodal transportation
+rail freight operations
+air cargo operations
+logistics coordination
+dispatch operations
+load tendering
+delivery route management
+vehicle load planning
+fleet safety
+driver compliance
+driver qualification files|DQF
+driver vehicle inspection report|DVIR
+accident reporting
+roadside assistance coordination
+vehicle telematics
+GPS fleet tracking
+warehouse productivity reporting
+inventory accuracy
+cycle count analysis
+shipping label generation
+parcel shipping
+freight audit
+freight payment
+yard management
+freight rate negotiation
+dispatch scheduling
+transportation cost control
+fleet utilization analysis
+warehouse receiving inspection
+warehouse inventory auditing
+distribution route planning
+delivery exception management
+load tracking
+transportation compliance reporting
+cold chain logistics
+cycle counting
+dot regulations
+electronic logging devices
+freight forwarding
+hazmat handling
+loading and unloading
+palletizing
+picking and packing
+procurement
+shipment tracking
+stock replenishment
+supply chain management
+last mile delivery
+fleet safety management
+distribution planning
+freight logistics
+fleet dispatch
+dispatch planning
+vehicle routing
+supply chain analytics
+warehouse labor management
+inventory forecasting
+dock operations
+warehouse receiving
+logistics planning

@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import numpy as np
 import pymupdf
+from app.preprocess import strip_invisible_unicode
 
 PDF_MAGIC = b"%PDF"
 NAME_RE = re.compile(
@@ -250,7 +251,7 @@ def extract_pdf(
                     ))
         rows = _column_aware_order(rows)
         lines = [row.text for row in rows]
-        text = "\n".join(lines)
+        text = strip_invisible_unicode("\n".join(lines))
         heading = next((ln for ln in lines if ln.strip()), "")
         name = _name_from_heading(rows, fallback)
         if hidden_found:

@@ -92,6 +92,7 @@ def test_cli_explains_generated_pdf(
     assert detail["role"] == "Automation Engineer"
     assert detail["sections"]["experience"] > 0
     assert detail["jd_skills"]
+    assert detail["detected_domains"]
     assert detail["matched_skills"]["lexical"]
     assert all(
         "cosine" in skill for skill in detail["matched_skills"]["lexical"]
@@ -101,3 +102,37 @@ def test_cli_explains_generated_pdf(
     assert detail["calibrated_semantic"] is not None
     assert detail["formula"]["match_percentage"] >= 0
     assert all(len(chunk["text"]) <= 123 for chunk in detail["top_chunks"])
+
+
+def test_cli_writes_utf8_json_file(
+        tmp_path,
+        monkeypatch,
+        capsys,
+) -> None:
+    pdf_path = tmp_path / "generated.pdf"
+    pdf_path.write_bytes(generated_pdf())
+    jd_path = tmp_path / "job-description.txt"
+    jd_path.write_text(
+        "Automation Engineer requiring Python, PLC, SCADA, HMI, "
+        "and industrial systems experience.",
+        encoding="utf-8",
+    )
+    output_path = tmp_path / "scores.json"
+    settings = Settings(min_text_chars=1)
+    monkeypatch.setattr(explain_scores, "get_settings", lambda: settings)
+    monkeypatch.setattr(
+        explain_scores, "load_model", lambda _settings: FakeModel()
+    )
+    args = argparse.Namespace(
+        jd_file=jd_path,
+        pdfs=str(tmp_path / "*.pdf"),
+        no_calibrator=True,
+        out=output_path,
+    )
+
+    asyncio.run(explain_scores.run(args))
+
+    assert capsys.readouterr().out == ""
+    data = json.loads(output_path.read_text(encoding="utf-8"))
+    assert len(data) == 1
+    assert data[0]["candidate_name"] == "JANE DOE"

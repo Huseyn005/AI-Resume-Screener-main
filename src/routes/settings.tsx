@@ -7,10 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useScreening, type Weights } from "@/lib/screening";
-import { pageHead } from "@/lib/page-head";
 
 export const Route = createFileRoute("/settings")({
-  head: () => pageHead("Settings", "Manage your profile, scoring weights and screening data."),
   component: SettingsPage,
 });
 

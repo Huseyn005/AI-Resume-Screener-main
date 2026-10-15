@@ -4,16 +4,41 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  HeadContent,
-  Scripts,
+  useRouterState,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { type ReactNode } from "react";
+import { useEffect } from "react";
 
-import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { ScreeningProvider } from "@/lib/screening";
 import { AppHeader } from "@/components/app-header";
+
+const pageMetadata: Record<string, { title: string; description: string }> = {
+  "/": {
+    title: "Screen resumes — Shortlist",
+    description: "Paste a job description, upload resumes, and see who fits best.",
+  },
+  "/candidates": {
+    title: "All candidates — Shortlist",
+    description: "Search every candidate across all of your saved jobs.",
+  },
+  "/jobs": {
+    title: "Saved jobs — Shortlist",
+    description: "Reopen saved job descriptions and their screened candidates.",
+  },
+  "/settings": {
+    title: "Settings — Shortlist",
+    description: "Manage your profile, scoring weights and screening data.",
+  },
+  "/shortlist": {
+    title: "Your shortlist — Shortlist",
+    description: "Candidates ranked by match score, with filters and CSV export.",
+  },
+};
+const defaultMetadata = {
+  title: "Shortlist — Resume screening",
+  description: "Match resumes to your job in three simple steps.",
+};
 
 function NotFoundComponent() {
   return (
@@ -73,52 +98,29 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Shortlist — Resume screening" },
-      { name: "description", content: "Match resumes to your job in three simple steps." },
-      { property: "og:title", content: "Shortlist — Resume screening" },
-      { property: "og:description", content: "Match resumes to your job in three simple steps." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" },
-    ],
-  }),
-  shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
 
-function RootShell({ children }: { children: ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const metadata = pageMetadata[pathname] ?? defaultMetadata;
+
+  useEffect(() => {
+    document.title = metadata.title;
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute("content", metadata.description);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", metadata.title);
+    document
+      .querySelector('meta[property="og:description"]')
+      ?.setAttribute("content", metadata.description);
+  }, [metadata.title, metadata.description]);
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <ScreeningProvider>
         <AppHeader />
         <Outlet />

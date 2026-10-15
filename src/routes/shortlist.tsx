@@ -2,10 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { CandidateTable } from "@/components/candidate-table";
 import { useScreening } from "@/lib/screening";
-import { pageHead } from "@/lib/page-head";
 
 export const Route = createFileRoute("/shortlist")({
-  head: () => pageHead("Your shortlist", "Candidates ranked by match score, with filters and CSV export."),
   component: ShortlistPage,
 });
 

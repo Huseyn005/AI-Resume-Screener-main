@@ -160,8 +160,3 @@
 
 @utility bg-hero { background-image: var(--gradient-hero); }
 @utility shadow-soft { box-shadow: var(--shadow-soft); }
-
-#lovable-badge,
-[class*="lovable-badge"] {
-  display: none !important;
-}

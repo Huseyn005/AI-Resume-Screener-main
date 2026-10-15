@@ -10,10 +10,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CandidateCard } from "@/components/candidate-card";
 import { cn } from "@/lib/utils";
 import { average, EMPLOYMENT, formatSize, levelOf, useScreening } from "@/lib/screening";
-import { pageHead } from "@/lib/page-head";
 
 export const Route = createFileRoute("/")({
-  head: () => pageHead("Screen resumes", "Paste a job description, upload resumes, and see who fits best."),
   component: ScreenPage,
 });
 

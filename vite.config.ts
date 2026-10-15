@@ -1,17 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
-import path from "node:path";
+import tailwindcss from "@tailwindcss/vite"; // Or your specific Tailwind setup
+import path from "path";
 
 export default defineConfig({
-  plugins: [tailwindcss(), react()],
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  server: {
-    port: 8080,
-    host: true,
+  build: {
+    chunkSizeWarningLimit: 1500, // Increases the warning limit to 1.5MB to account for PDF.js
   },
 });

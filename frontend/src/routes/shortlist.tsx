@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { CandidateTable } from "@/components/candidate-table";
-import { useScreening } from "@/lib/screening";
+import { CandidateTable } from "@/features/screening/components/candidate-table";
+import { useScreening } from "@/features/screening/screening";
 
 export const Route = createFileRoute("/shortlist")({
   component: ShortlistPage,

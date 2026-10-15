@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useScreening } from "@/lib/screening";
+import { useScreening } from "@/features/screening/screening";
 
 const NAV = [
   { to: "/", label: "Screen" },

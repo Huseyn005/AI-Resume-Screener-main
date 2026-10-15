@@ -10,8 +10,8 @@ import {
 import { useEffect } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
-import { ScreeningProvider } from "@/lib/screening";
-import { AppHeader } from "@/components/app-header";
+import { ScreeningProvider } from "@/features/screening/screening";
+import { AppHeader } from "@/components/layout/app-header";
 
 const pageMetadata: Record<string, { title: string; description: string }> = {
   "/": {

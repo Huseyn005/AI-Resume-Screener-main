@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { average, useScreening } from "@/lib/screening";
+import { average, useScreening } from "@/features/screening/screening";
 
 export const Route = createFileRoute("/jobs")({
   component: JobsPage,

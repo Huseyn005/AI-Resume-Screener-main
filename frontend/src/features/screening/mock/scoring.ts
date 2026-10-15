@@ -1,5 +1,5 @@
 // Client-side resume parsing and matching against a job description.
-import type { Weights } from "./screening";
+import type { Weights } from "../screening";
 
 const SKILLS = [
   "Figma",

@@ -7,9 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CandidateCard } from "@/components/candidate-card";
+import { CandidateCard } from "@/features/screening/components/candidate-card";
 import { cn } from "@/lib/utils";
-import { average, EMPLOYMENT, formatSize, levelOf, useScreening } from "@/lib/screening";
+import {
+  average,
+  EMPLOYMENT,
+  formatSize,
+  levelOf,
+  useScreening,
+} from "@/features/screening/screening";
 
 export const Route = createFileRoute("/")({
   component: ScreenPage,

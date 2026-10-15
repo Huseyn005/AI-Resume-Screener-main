@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ChevronDown, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { levelLabel, levelOf, useScreening, type Candidate } from "@/lib/screening";
-import { CandidateStatus } from "@/components/candidate-status";
+import { levelLabel, levelOf, useScreening, type Candidate } from "@/features/screening/screening";
+import { CandidateStatus } from "@/features/screening/components/candidate-status";
 
 const tone = {
   great: { ring: "text-success", chip: "bg-success-soft text-success", bar: "bg-success" },

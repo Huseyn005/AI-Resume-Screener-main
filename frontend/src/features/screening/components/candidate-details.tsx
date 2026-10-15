@@ -3,9 +3,9 @@ import { Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { Progress } from "@/components/ui/progress";
-import { getResume } from "@/lib/resume-store";
-import { useScreening, type Candidate } from "@/lib/screening";
-import { CandidateStatus } from "@/components/candidate-status";
+import { getResume } from "@/features/screening/resume-store";
+import { useScreening, type Candidate } from "@/features/screening/screening";
+import { CandidateStatus } from "@/features/screening/components/candidate-status";
 
 function Chips({ items, empty, muted }: { items: string[]; empty: string; muted?: boolean }) {
   if (!items.length) return <p className="text-sm text-muted-foreground">{empty}</p>;

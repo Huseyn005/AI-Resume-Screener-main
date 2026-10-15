@@ -1,4 +1,4 @@
-import type { Candidate } from "@/lib/screening";
+import type { Candidate } from "@/features/screening/screening";
 
 type CandidateStatusPart = "all" | "badges" | "message";
 

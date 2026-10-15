@@ -15,7 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useScreening, type Weights } from "@/lib/screening";
+import { useScreening, type Weights } from "@/features/screening/screening";
 
 export const Route = createFileRoute("/settings")({
   component: SettingsPage,

@@ -1,9 +1,9 @@
 # Shortlist Resume Screener
 
-Shortlist is a React, Vite, and TanStack Router single-page app backed by a
-FastAPI resume-analysis service. Screening state is persisted in the browser;
-PDFs are stored in IndexedDB. The app has an opt-in, client-side mock scorer for
-demo use.
+Shortlist is a React, Vite, and TanStack Router single-page app in `frontend/`,
+backed by a FastAPI service in `backend/`. Screening data is persisted in the
+browser and uploaded resume PDFs are stored in IndexedDB. An opt-in local mock
+scorer is available for demos.
 
 ## Architecture
 
@@ -17,16 +17,16 @@ flowchart LR
 ```
 
 The browser calls the API URL configured by `VITE_API_URL`. See
-[backend/README.md](backend/README.md) for API setup and
+[docs/architecture.md](docs/architecture.md) for the frontend data flow,
+[backend/README.md](backend/README.md) for backend setup, and
 [backend/ml/REPORT.md](backend/ml/REPORT.md) for the current model report.
 
 ## Quick start
 
 ### Backend
 
-Create and activate a Python virtual environment, then follow the dependency
-setup in [backend/README.md](backend/README.md). A PowerShell local run from the
-repository root is:
+From the repository root, create a Python virtual environment and run the API
+from `backend/` (the setup commands below are for PowerShell):
 
 ```powershell
 cd backend
@@ -38,39 +38,43 @@ Copy-Item .env.example .env
 uvicorn app.main:app --port 8000
 ```
 
-Set `ALLOWED_ORIGINS` to the frontend origin. The checked-in
-[backend/.env.example](backend/.env.example) includes localhost ports 8080 and
-5173.
+Set `ALLOWED_ORIGINS` to the frontend origin in `backend/.env`. The checked-in
+template lists `http://localhost:8080` and `http://localhost:5173`.
 
 ### Frontend
 
 From the repository root:
 
-```sh
-npm ci
-Copy-Item .env.example .env.local # PowerShell; use cp on macOS/Linux
-npm run dev
+```powershell
+npm --prefix frontend ci
+Copy-Item frontend/.env.example frontend/.env.local
+npm --prefix frontend run dev
 ```
 
-Vite's default development URL is `http://localhost:5173/`. The frontend
-environment template sets `VITE_API_URL=http://localhost:8000` and
-`VITE_USE_MOCK=false`. Set `VITE_USE_MOCK=true` to use the local demo scorer
-instead of the API.
+Vite uses its default development URL, `http://localhost:5173/`. The frontend
+template sets `VITE_API_URL=http://localhost:8000` and `VITE_USE_MOCK=false`.
+Set `VITE_USE_MOCK=true` to run the optional browser-only demo scorer instead
+of calling the API.
 
 ## Checks
 
-```sh
-npm run lint
-npm test
-npm run build
+Run the frontend checks from the repository root:
+
+```powershell
+npm --prefix frontend run lint
+npm --prefix frontend test
+npm --prefix frontend run build
 ```
 
-Run backend tests from `backend/` with `python -m pytest`.
+Run backend tests from `backend/` with `python -m pytest`. The backend API
+contract and additional setup details are documented in
+[backend/README.md](backend/README.md).
 
 ## Deployment
 
-The SPA is deployed to [Vercel](https://vercel.com/) with the repository's
-`vercel.json` rewrite for client-side routes. Configure `VITE_API_URL` in the
-Vercel project for a reachable API. Backend hosting is not configured in this
-repository. See [docs/deployment.md](docs/deployment.md) for deployment and
-preview guidance.
+The Vercel project builds the SPA from `frontend/` using the root
+[`vercel.json`](vercel.json) configuration. Set `VITE_API_URL` in the Vercel
+environment to a reachable API URL. Backend hosting is not configured in this
+repository. See [docs/deployment.md](docs/deployment.md) and
+[docs/local-testing-with-ngrok.md](docs/local-testing-with-ngrok.md) for
+deployment and preview testing instructions.

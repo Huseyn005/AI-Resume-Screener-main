@@ -11,7 +11,7 @@ The TanStack Router route modules are:
 | `settings.tsx` | `/settings` | Profile, scoring weights, and local data |
 | `__root.tsx` | Root layout | Shared app shell and route outlet |
 
-`src/routeTree.gen.ts` is maintained by hand in this project; there is no
+`frontend/src/routeTree.gen.ts` is maintained by hand in this project; there is no
 TanStack Router Vite plugin generating it. When adding, removing, or renaming a
 route, update its imports, route registrations, and route type declarations
-alongside the route module. Keep the route matching test in `src/test/` passing.
+alongside the route module. Keep the route matching test in `frontend/src/test/` passing.

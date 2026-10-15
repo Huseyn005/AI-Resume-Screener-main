@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CandidateDetails } from "@/components/candidate-details";
-import { CandidateStatus } from "@/components/candidate-status";
-import { initials, useScreening, type Candidate } from "@/lib/screening";
+import { CandidateDetails } from "@/features/screening/components/candidate-details";
+import { CandidateStatus } from "@/features/screening/components/candidate-status";
+import { initials, useScreening, type Candidate } from "@/features/screening/screening";
 import { cn } from "@/lib/utils";
 
 export function CandidateTable({ allJobs = false }: { allJobs?: boolean }) {

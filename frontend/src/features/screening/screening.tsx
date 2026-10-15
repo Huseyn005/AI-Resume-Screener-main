@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
-import { extractPdfText, scoreResume } from "./scoring";
+import { extractPdfText, scoreResume } from "./mock/scoring";
 import { analyzeResumes, type BackendAnalysisResult } from "./api";
 import { clearResumes, deleteResumes, getResume, putResume } from "./resume-store";
 

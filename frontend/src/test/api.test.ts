@@ -42,4 +42,15 @@ describe("analyzeResumes", () => {
       expect(body.getAll("resumes")).toHaveLength(1);
     },
   );
+
+  it("shows the configured API base URL when the backend cannot be reached", async () => {
+    const baseUrl = "https://screening.example.test";
+    vi.stubEnv("VITE_API_URL", `${baseUrl}/`);
+    const fetchMock = vi.fn<typeof fetch>().mockRejectedValue(new TypeError("Failed to fetch"));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(analyzeResumes("Test job description", [])).rejects.toThrow(
+      `Backend not reachable at ${baseUrl}`,
+    );
+  });
 });

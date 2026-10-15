@@ -18,8 +18,8 @@ export type BackendAnalysisResult = {
 };
 
 export class BackendNotReachableError extends Error {
-  constructor() {
-    super("Backend not reachable on localhost:8000");
+  constructor(baseUrl: string) {
+    super(`Backend not reachable at ${baseUrl}`);
     this.name = "BackendNotReachableError";
   }
 }
@@ -45,7 +45,7 @@ export async function analyzeResumes(jd: string, files: File[]): Promise<unknown
       ...(needsNgrokWarningHeader ? { headers: { "ngrok-skip-browser-warning": "true" } } : {}),
     });
   } catch {
-    throw new BackendNotReachableError();
+    throw new BackendNotReachableError(baseUrl);
   }
 
   if (!response.ok) {

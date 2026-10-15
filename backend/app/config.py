@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     )
     embed_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     allowed_origins: str = (
-        "https://pushcv.vercel.app,https://ml-resume-screener-9a153ybpl.vercel.app,http://localhost:5173,http://localhost:8080"
+        "pushcv.vercel.app, statcv.vercel.app, pullcv.vercel.app, taphire.vercel.app, dragcv.vercel.app,http://localhost:5173,http://localhost:8080"
     )
     semantic_weight: float = 0.5
     skill_weight: float = 0.40

@@ -34,17 +34,29 @@ export async function analyzeResumes(jd: string, files: File[]): Promise<unknown
 
   let response: Response;
   try {
-    response = await fetch(`${baseUrl}/analyze`, { method: "POST", body: formData });
+    const request: RequestInit = { method: "POST", body: formData };
+    if (import.meta.env.DEV) {
+      request.headers = { "ngrok-skip-browser-warning": "true" };
+    }
+    response = await fetch(`${baseUrl}/analyze`, request);
   } catch {
     throw new BackendNotReachableError();
   }
 
   if (!response.ok) {
     const body: unknown = await response.json().catch(() => null);
-    const message = typeof body === "object" && body !== null
-      ? "detail" in body ? body.detail : "error" in body ? body.error : "message" in body ? body.message : undefined
-      : undefined;
-    const detail = typeof message === "string" ? message : message === undefined ? "" : JSON.stringify(message);
+    const message =
+      typeof body === "object" && body !== null
+        ? "detail" in body
+          ? body.detail
+          : "error" in body
+            ? body.error
+            : "message" in body
+              ? body.message
+              : undefined
+        : undefined;
+    const detail =
+      typeof message === "string" ? message : message === undefined ? "" : JSON.stringify(message);
     throw new Error(detail || `Analysis failed with status ${response.status}.`);
   }
 

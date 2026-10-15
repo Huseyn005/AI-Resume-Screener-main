@@ -790,12 +790,13 @@ autocad
 solidworks
 catia
 ansys
-matlab simulink
+matlab|matlab simulink
 labview
 plc|plcs|plc-based|plcs-based|programmable logic controller|programmable logic controllers|programmable-logic-controller|programmable-logic-controllers
 scada|supervisory control and data acquisition|supervisory control and data acquisition systems
 hmi|human machine interface|human machine interfaces|human-machine interface|human-machine interfaces
 dcs|distributed control system|distributed control systems|distributed-control-system|distributed-control-systems
+pid|pid controller|proportional integral derivative
 tia portal|siemens tia portal
 modbus
 profibus

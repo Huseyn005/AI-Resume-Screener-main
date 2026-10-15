@@ -14,6 +14,7 @@ STOP = {
     "this", "that", "these", "those", "we", "you", "they", "our",
     "your", "their", "i", "it",
 }
+AMBIGUOUS_SKILLS = {"phoenix", "lion", "flow", "equipment"}
 SINGLE_SKILLS = {"c", "r"}
 SKILLS_HEADING_RE = re.compile(
     r"^(?:technical\s+)?skills$|^core\s+competenc(?:y|ies)$|"
@@ -50,7 +51,11 @@ def load_skills(path: Path | None = None) -> SkillLexicon:
         parts = [
             p.strip().lower()
             for p in line.split("|")
-            if p.strip() and not p.strip().isdigit()
+            if (
+                p.strip()
+                and not p.strip().isdigit()
+                and p.strip().lower() not in AMBIGUOUS_SKILLS
+            )
         ]
         if not parts:
             continue
@@ -141,12 +146,20 @@ def _single_skill_allowed(
     )
 
 
-def noun_phrases(text: str) -> list[str]:
-    tokens = [
-        token for token in
-        re.findall(r"[A-Za-z][A-Za-z0-9+#.]{1,}", text)
-        if len(token) >= 2
-    ]
+def noun_phrases(
+        text: str,
+        max_phrases: int = 256,
+        max_phrase_chars: int = 128,
+) -> list[str]:
+    if max_phrases <= 0 or max_phrase_chars < 2:
+        return []
+    tokens: list[str] = []
+    for match in re.finditer(r"[A-Za-z][A-Za-z0-9+#.]{1,}", text):
+        token = match.group()
+        if len(token) <= 64:
+            tokens.append(token)
+        if len(tokens) >= max_phrases:
+            break
     phrases: list[str] = []
     seen: set[str] = set()
     i = 0
@@ -160,9 +173,15 @@ def noun_phrases(text: str) -> list[str]:
         while j < n and j < i + 3 and tokens[j].lower() not in STOP:
             buf.append(tokens[j])
             phrase = " ".join(buf).lower()
-            if phrase not in seen and len(phrase) >= 2:
+            if (
+                phrase not in seen
+                and len(phrase) >= 2
+                and len(phrase) <= max_phrase_chars
+            ):
                 seen.add(phrase)
                 phrases.append(phrase)
+                if len(phrases) >= max_phrases:
+                    return phrases
             j += 1
         i = j if j > i else i + 1
     return phrases
@@ -174,6 +193,7 @@ def semantic_skill_matches(
         skill_emb: np.ndarray,
         phrase_emb: np.ndarray,
         threshold: float,
+        lexicon: SkillLexicon,
 ) -> list[tuple[str, float]]:
     if (
         not unmatched
@@ -182,7 +202,13 @@ def semantic_skill_matches(
         or phrase_emb.size == 0
     ):
         return []
-    sim = cosine_similarity(skill_emb, phrase_emb)
+    eligible = [
+        index for index, phrase in enumerate(phrases)
+        if extract_lexical(phrase, lexicon)
+    ]
+    if not eligible:
+        return []
+    sim = cosine_similarity(skill_emb, phrase_emb[eligible])
     hits: list[tuple[str, float]] = []
     for i, skill in enumerate(unmatched):
         score = float(sim[i].max())

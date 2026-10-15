@@ -14,7 +14,9 @@ python -m pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
 
-Set `ALLOWED_ORIGINS` to a comma-separated list of allowed browser origins.
+By default, `ALLOWED_ORIGINS` includes `https://pushcv.vercel.app`,
+`http://localhost:5173`, and `http://localhost:8080`. Override it with a
+comma-separated list of allowed browser origins for your deployment.
 `EMBED_MODEL` defaults to `sentence-transformers/all-MiniLM-L6-v2`; the model
 is downloaded on first use if it is not cached locally.
 
@@ -28,6 +30,21 @@ The API exposes `GET /health` and `POST /analyze`. Health reports the loaded
 model and whether the semantic calibrator is loaded. The analyze endpoint
 accepts a `job_description` form field and one or more PDF files in the
 `resumes` form field. Job descriptions must contain 50-10,000 characters.
+
+Score explanations are disabled by default. Set `DEBUG_ENDPOINTS=1` to enable
+the additional `debug` field from `POST /analyze?debug=true`; the normal
+response remains unchanged when `debug` is omitted or false.
+
+To inspect scores locally without changing API responses, run the diagnostic
+tool from the repository root:
+
+```powershell
+python backend\tools\explain_scores.py --jd-file path\to\job-description.txt --pdfs "backend\samples\*.pdf"
+```
+
+Add `--no-calibrator` to use the linear semantic fallback. The tool reads PDF
+files locally and prints extraction, skill, chunk-similarity, and score-formula
+details as JSON.
 
 ## Analyze result schema
 

@@ -1,0 +1,38 @@
+[
+  {
+    "role": "automation engineer",
+    "relevance": 3,
+    "name": "Avery Chen",
+    "text": "Avery Chen\nAutomation Engineer\nSkills\nPLC, SCADA, DCS, HMI, Modbus, PID, MATLAB, instrumentation\nExperience\nDesigned and commissioned industrial PLC and SCADA systems. Programmed DCS, HMI, Modbus networks, PID control loops, and MATLAB models for manufacturing process optimization, safety, and troubleshooting."
+  },
+  {
+    "role": "process engineer",
+    "relevance": 3,
+    "name": "Samira Ali",
+    "text": "Samira Ali\nProcess Engineer\nSkills\nPLC, SCADA, HMI, Modbus, PID, MATLAB, process control\nExperience\nOptimized chemical manufacturing processes using instrumentation, PLC and SCADA control, HMI configuration, Modbus communication, PID tuning, MATLAB analysis, safety reviews, and troubleshooting."
+  },
+  {
+    "role": "instrument control engineer intern",
+    "relevance": 2,
+    "name": "Taylor Kim",
+    "text": "Taylor Kim\nInstrument and Control Engineer Intern\nSkills\nPLC, SCADA, HMI, instrumentation, control systems\nExperience\nSupported industrial instrumentation, PLC and SCADA commissioning, control loop testing, HMI configuration, manufacturing safety, and troubleshooting. Limited independent design experience."
+  },
+  {
+    "role": "social media manager",
+    "relevance": 0,
+    "name": "Morgan Reed",
+    "text": "Morgan Reed\nSocial Media Manager\nExperience\nManaged content operations and process optimization for a global brand. Developed automated workflows for campaign production, quality monitoring, system integration, and performance reporting. Troubleshot operational bottlenecks and supported compliance for high-volume communications projects. Built dashboards for continuous improvement of campaign delivery and operational efficiency."
+  },
+  {
+    "role": "accountant",
+    "relevance": 0,
+    "name": "Jamie Park",
+    "text": "Jamie Park\nAccountant\nSkills\naccounting, financial reporting, Excel, auditing\nExperience\nAutomated financial workflows, managed internal process controls and reporting systems, reconciled equipment asset records, and produced dashboards for performance monitoring and compliance."
+  },
+  {
+    "role": "java developer",
+    "relevance": 0,
+    "name": "Riley Shah",
+    "text": "Riley Shah\nJava Developer\nSkills\nJava, Spring, SQL, REST, Docker\nExperience\nBuilt automation frameworks and process monitoring software using Java. Implemented control flow, event processing, monitoring dashboards, data integration, and automated testing for enterprise systems."
+  }
+]

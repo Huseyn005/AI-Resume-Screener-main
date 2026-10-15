@@ -7,8 +7,10 @@ import numpy as np
 import pymupdf
 import pytest
 from fastapi.testclient import TestClient
+from fastapi.middleware.cors import CORSMiddleware
 
 from app import main
+from app.config import Settings
 from app.explain import build_reason
 from app.extract import extract_pdf
 from app.preprocess import (
@@ -29,6 +31,7 @@ class FakeTokenizer:
             self,
             text: str,
             add_special_tokens: bool = True,
+            verbose: bool = True,
     ) -> list[int]:
         tokens = re.findall(r"[A-Za-z]+|[0-9]+|[^\w\s]", text)
         ids = [abs(hash(token.lower())) % 10000 for token in tokens]
@@ -134,6 +137,34 @@ def test_numeric_only_entries_are_not_skills() -> None:
     assert extract_lexical("01", lexicon) == []
 
 
+def test_ambiguous_generic_terms_are_not_required_skills() -> None:
+    lexicon = load_skills()
+
+    assert extract_lexical("phoenix, lion, flow, equipment", lexicon) == []
+    assert extract_lexical("Phoenix LiveView and flow control", lexicon) == [
+        "phoenix liveview", "flow control",
+    ]
+
+
+def test_semantic_skill_hits_require_a_lexicon_phrase() -> None:
+    from app.skills import semantic_skill_matches
+
+    lexicon = load_skills()
+    hits = semantic_skill_matches(
+        ["plc"],
+        ["phoenix", "equipment", "scada"],
+        np.asarray([[1.0, 0.0]], dtype=np.float32),
+        np.asarray(
+            [[1.0, 0.0], [1.0, 0.0], [1.0, 0.0]],
+            dtype=np.float32,
+        ),
+        0.72,
+        lexicon,
+    )
+
+    assert hits == [("plc", 1.0)]
+
+
 @pytest.mark.parametrize(
     "resume_skill",
     ["programmable logic controllers", "PLCs", "PLC-based"],
@@ -207,6 +238,60 @@ def test_top_skills_follow_jd_appearance(client: TestClient) -> None:
     assert result["top_skills"] == ["python", "pytorch", "nlp"]
     assert not {"to", "we", "the"}.intersection(
         result["matched"] + result["missing_skills"]
+    )
+
+
+def test_debug_explanation_is_opt_in_and_gated(
+        client: TestClient,
+) -> None:
+    files = [
+        (
+            "resumes",
+            (
+                "ml_engineer.pdf",
+                make_pdf(resume_text("Python, PyTorch, NLP, FastAPI")),
+                "application/pdf",
+            ),
+        )
+    ]
+    data = {"job_description": JOB_DESCRIPTION}
+    default = client.post("/analyze", data=data, files=files)
+    assert default.status_code == 200
+    assert "debug" not in default.json()
+
+    denied = client.post(
+        "/analyze?debug=true", data=data, files=files
+    )
+    assert denied.status_code == 403
+
+    client.app.state.settings.debug_endpoints = True
+    response = client.post(
+        "/analyze?debug=true", data=data, files=files
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert set(payload) == {"results", "debug"}
+    detail = payload["debug"][0]
+    assert detail["candidate_name"] == payload["results"][0]["candidate_name"]
+    assert {"python", "pytorch", "nlp", "fastapi"}.issubset(
+        detail["jd_skills"]
+    )
+    assert detail["matched_skills"]["lexical"]
+    assert detail["formula"]["match_percentage"] == (
+        payload["results"][0]["match_percentage"]
+    )
+    assert detail["formula"]["expression"]
+    formula = detail["formula"]
+    assert formula["pre_clipped_score"] == pytest.approx(
+        formula["weighted_semantic"]
+        + formula["weighted_skills"]
+        + formula["weighted_section_fit"]
+    )
+    assert formula["final_score"] == pytest.approx(
+        min(1.0, max(0.0, formula["pre_clipped_score"]))
+    )
+    assert formula["match_percentage"] == round(
+        formula["final_score"] * 100
     )
 
 
@@ -304,3 +389,24 @@ def test_reason_has_two_sentences_and_omits_other_section() -> None:
         "This resume covers python. Key gaps include: java, sql."
     )
     assert reason.count(". ") == 1
+
+
+def test_cors_uses_configured_origins(
+        monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = Settings(
+        allowed_origins=(
+            "https://pushcv.vercel.app,http://localhost:5173"
+        )
+    )
+    monkeypatch.setattr(main, "get_settings", lambda: settings)
+
+    app = main.create_app()
+
+    cors = next(
+        middleware for middleware in app.user_middleware
+        if middleware.cls is CORSMiddleware
+    )
+    assert cors.kwargs["allow_origins"] == [
+        "https://pushcv.vercel.app", "http://localhost:5173",
+    ]

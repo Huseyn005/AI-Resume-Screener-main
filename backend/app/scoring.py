@@ -70,8 +70,9 @@ def combine(semantic: float, skills: float, section: float,
             settings: Settings,
             calibrator: IsotonicRegression | None = None) -> ScoreParts:
     calibrated = semantic_probability(semantic, settings, calibrator)
+    semantic_support = 0.5 + 0.5 * float(np.sqrt(skills))
     final = (
-        settings.semantic_weight * calibrated
+        settings.semantic_weight * calibrated * semantic_support
         + settings.skill_weight * skills
         + settings.section_weight * section
     )

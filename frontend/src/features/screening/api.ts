@@ -34,7 +34,16 @@ export async function analyzeResumes(jd: string, files: File[]): Promise<unknown
 
   let response: Response;
   try {
-    response = await fetch(`${baseUrl}/analyze`, { method: "POST", body: formData });
+    const hostname = new URL(baseUrl, window.location.origin).hostname;
+    const needsNgrokWarningHeader = [".ngrok-free.app", ".ngrok-free.dev", ".ngrok.app"].some(
+      (suffix) => hostname.endsWith(suffix),
+    );
+
+    response = await fetch(`${baseUrl}/analyze`, {
+      method: "POST",
+      body: formData,
+      ...(needsNgrokWarningHeader ? { headers: { "ngrok-skip-browser-warning": "true" } } : {}),
+    });
   } catch {
     throw new BackendNotReachableError();
   }

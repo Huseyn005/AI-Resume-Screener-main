@@ -1,14 +1,39 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+# Agent and developer guidance
 
-## Architecture
-- Screening state lives in `src/lib/screening.tsx` (React context) and persists to localStorage; resume PDFs persist in IndexedDB (`src/lib/resume-store.ts`). Why: no backend is connected; data stays in the browser.
-- Resume matching is client-side in `src/lib/scoring.ts` (pdfjs text extraction + skill/experience/education weighting). Why: works offline with no AI credentials.
+## Repository layout
+
+- `src/`, `public/`, and the Vite configuration contain the React SPA.
+- `backend/` contains the FastAPI service. See [backend/README.md](backend/README.md)
+  for setup and test instructions.
+- `docs/` contains architecture, deployment, and frontend notes.
+
+## Commands
+
+Run frontend commands from the repository root:
+
+```sh
+npm ci
+npm run dev
+npm run lint
+npm test
+npm run build
+```
+
+Vite uses its default development port, 5173.
+
+Run backend commands from `backend/`:
+
+```sh
+python -m pytest
+uvicorn app.main:app --port 8000
+```
+
+## Conventions and safety
+
+- Frontend: follow the existing Prettier and ESLint configuration.
+- Backend: follow PEP 8 and keep lines within 79 characters.
+- Preserve the API contract: `POST {VITE_API_URL}/analyze`, multipart fields
+  `job_description` and `resumes`, and the response type in `src/lib/api.ts`.
+- Never commit real CVs or anything under `backend/samples/`.
+- Do not force-push shared branches.
+- Ask before touching `backend/` when a task is frontend-only.

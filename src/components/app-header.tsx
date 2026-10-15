@@ -3,7 +3,13 @@ import { LogOut, Menu, ScanLine, Settings, Star, UserRound } from "lucide-react"
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useScreening } from "@/lib/screening";
 
 const NAV = [
@@ -14,7 +20,8 @@ const NAV = [
   { to: "/settings", label: "Settings" },
 ] as const;
 
-const linkCls = "rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground";
+const linkCls =
+  "rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground";
 const active = { className: "bg-secondary !text-secondary-foreground" };
 
 export function AppHeader() {
@@ -23,13 +30,21 @@ export function AppHeader() {
 
   const links = (onClick?: () => void, block = false) =>
     NAV.map((n) => (
-      <Link key={n.to} to={n.to} onClick={onClick} className={block ? `${linkCls} block` : linkCls}
-        activeOptions={{ exact: n.to === "/" }} activeProps={active}>
+      <Link
+        key={n.to}
+        to={n.to}
+        onClick={onClick}
+        className={block ? `${linkCls} block` : linkCls}
+        activeOptions={{ exact: n.to === "/" }}
+        activeProps={active}
+      >
         <span className="flex items-center gap-1.5">
           {n.to === "/shortlist" && <Star className="size-4" />}
           {n.label}
           {n.to === "/shortlist" && shortlist.length > 0 && (
-            <span className="rounded-full bg-accent px-2 text-xs text-accent-foreground">{shortlist.length}</span>
+            <span className="rounded-full bg-accent px-2 text-xs text-accent-foreground">
+              {shortlist.length}
+            </span>
           )}
         </span>
       </Link>
@@ -48,22 +63,54 @@ export function AppHeader() {
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full" aria-label="Account menu">
-                {profile.name ? <span className="text-xs font-bold">{profile.name.slice(0, 2).toUpperCase()}</span> : <UserRound />}
+              <Button
+                variant="secondary"
+                size="icon"
+                className="rounded-full"
+                aria-label="Account menu"
+              >
+                {profile.name ? (
+                  <span className="text-xs font-bold">
+                    {profile.name.slice(0, 2).toUpperCase()}
+                  </span>
+                ) : (
+                  <UserRound />
+                )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 rounded-2xl">
               <div className="px-2 py-1.5 text-sm">
                 <p className="font-semibold">{profile.name || "Guest"}</p>
-                {profile.email && <p className="truncate text-xs text-muted-foreground">{profile.email}</p>}
+                {profile.email && (
+                  <p className="truncate text-xs text-muted-foreground">{profile.email}</p>
+                )}
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild><Link to="/settings"><UserRound className="mr-2 size-4" />Profile</Link></DropdownMenuItem>
-              <DropdownMenuItem asChild><Link to="/settings"><Settings className="mr-2 size-4" />Settings</Link></DropdownMenuItem>
-              <DropdownMenuItem onClick={signOut}><LogOut className="mr-2 size-4" />Sign out</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/settings">
+                  <UserRound className="mr-2 size-4" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/settings">
+                  <Settings className="mr-2 size-4" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={signOut}>
+                <LogOut className="mr-2 size-4" />
+                Sign out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="ghost" size="icon" className="rounded-full md:hidden" aria-label="Open menu" onClick={() => setMenu(true)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full md:hidden"
+            aria-label="Open menu"
+            onClick={() => setMenu(true)}
+          >
             <Menu />
           </Button>
         </div>

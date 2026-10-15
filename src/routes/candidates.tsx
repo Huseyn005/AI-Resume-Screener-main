@@ -17,7 +17,9 @@ function CandidatesPage() {
       ) : (
         <div className="py-16 text-center">
           <p className="text-muted-foreground">No candidates screened yet.</p>
-          <Button asChild className="mt-5 rounded-full"><Link to="/">Screen resumes</Link></Button>
+          <Button asChild className="mt-5 rounded-full">
+            <Link to="/">Screen resumes</Link>
+          </Button>
         </div>
       )}
     </main>

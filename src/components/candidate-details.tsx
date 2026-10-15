@@ -12,13 +12,28 @@ function Chips({ items, empty, muted }: { items: string[]; empty: string; muted?
   return (
     <div className="flex flex-wrap gap-2">
       {items.map((s) => (
-        <span key={s} className={muted ? "rounded-full bg-danger-soft px-3 py-1 text-xs text-destructive" : "rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground"}>{s}</span>
+        <span
+          key={s}
+          className={
+            muted
+              ? "rounded-full bg-danger-soft px-3 py-1 text-xs text-destructive"
+              : "rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground"
+          }
+        >
+          {s}
+        </span>
       ))}
     </div>
   );
 }
 
-export function CandidateDetails({ candidate, onClose }: { candidate: Candidate | null; onClose: () => void }) {
+export function CandidateDetails({
+  candidate,
+  onClose,
+}: {
+  candidate: Candidate | null;
+  onClose: () => void;
+}) {
   const { jobs, files, shortlist, toggleShortlist, rejected, reject } = useScreening();
   const [url, setUrl] = useState<string>();
   const [loading, setLoading] = useState(false);
@@ -37,76 +52,174 @@ export function CandidateDetails({ candidate, onClose }: { candidate: Candidate 
     void (local ? Promise.resolve(local as Blob) : getResume(resumeId)).then((blob) => {
       if (!alive) return;
       setLoading(false);
-      if (blob) { objectUrl = URL.createObjectURL(blob); setUrl(objectUrl); }
+      if (blob) {
+        objectUrl = URL.createObjectURL(blob);
+        setUrl(objectUrl);
+      }
     });
-    return () => { alive = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };
+    return () => {
+      alive = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
   }, [resumeId, files]);
 
   const b = candidate?.scoreBreakdown;
   const legacyBreakdown = candidate?.breakdown;
   return (
-    <Sheet open={Boolean(candidate)} onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Sheet
+      open={Boolean(candidate)}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
         {candidate && (
           <div className="space-y-7 pb-8">
             <div className="pr-8">
               <div className="flex flex-wrap items-center gap-2">
-                <SheetTitle className="font-display text-2xl capitalize">{candidate.name}</SheetTitle>
+                <SheetTitle className="font-display text-2xl capitalize">
+                  {candidate.name}
+                </SheetTitle>
                 <CandidateStatus candidate={candidate} part="badges" />
               </div>
-              {resume?.name && <p title={resume.name} className="mt-1 truncate text-xs text-muted-foreground">{resume.name}</p>}
+              {resume?.name && (
+                <p title={resume.name} className="mt-1 truncate text-xs text-muted-foreground">
+                  {resume.name}
+                </p>
+              )}
               {subtitle && <SheetDescription>{subtitle}</SheetDescription>}
             </div>
             <CandidateStatus candidate={candidate} part="message" />
             {candidate.score !== null && (
               <div>
                 <p className="font-display text-6xl font-bold text-primary">{candidate.score}%</p>
-                <p className="mt-1 text-sm text-muted-foreground">Match score{job?.demo ? " · demo data" : ""}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Match score{job?.demo ? " · demo data" : ""}
+                </p>
               </div>
             )}
-            <section><h3 className="mb-2 font-semibold">Summary</h3><p className="text-sm text-muted-foreground">{candidate.summary}</p></section>
-            {candidate.reason && candidate.status !== "needs_ocr" && candidate.status !== "error" && <section><h3 className="mb-2 font-semibold">Reason</h3><p className="text-sm text-muted-foreground">{candidate.reason}</p></section>}
+            <section>
+              <h3 className="mb-2 font-semibold">Summary</h3>
+              <p className="text-sm text-muted-foreground">{candidate.summary}</p>
+            </section>
+            {candidate.reason &&
+              candidate.status !== "needs_ocr" &&
+              candidate.status !== "error" && (
+                <section>
+                  <h3 className="mb-2 font-semibold">Reason</h3>
+                  <p className="text-sm text-muted-foreground">{candidate.reason}</p>
+                </section>
+              )}
             <div className="grid gap-6 sm:grid-cols-2">
-              <section><h3 className="mb-2 font-semibold">Strengths</h3>
-                <ul className="space-y-1 text-sm text-muted-foreground">{(candidate.strengths?.length ? candidate.strengths : ["None found"]).map((s) => <li key={s}>{s}</li>)}</ul></section>
-              <section><h3 className="mb-2 font-semibold">Gaps</h3>
-                <ul className="space-y-1 text-sm text-muted-foreground">{(candidate.gaps?.length ? candidate.gaps : ["No major gaps"]).map((s) => <li key={s}>{s}</li>)}</ul></section>
+              <section>
+                <h3 className="mb-2 font-semibold">Strengths</h3>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  {(candidate.strengths?.length ? candidate.strengths : ["None found"]).map((s) => (
+                    <li key={s}>{s}</li>
+                  ))}
+                </ul>
+              </section>
+              <section>
+                <h3 className="mb-2 font-semibold">Gaps</h3>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  {(candidate.gaps?.length ? candidate.gaps : ["No major gaps"]).map((s) => (
+                    <li key={s}>{s}</li>
+                  ))}
+                </ul>
+              </section>
             </div>
-            <section><h3 className="mb-2 font-semibold">Matched skills</h3><Chips items={candidate.matched ?? candidate.skills} empty="No required skills matched" /></section>
-            <section><h3 className="mb-2 font-semibold">Missing skills</h3><Chips items={candidate.missing ?? []} empty="Nothing missing" muted /></section>
+            <section>
+              <h3 className="mb-2 font-semibold">Matched skills</h3>
+              <Chips
+                items={candidate.matched ?? candidate.skills}
+                empty="No required skills matched"
+              />
+            </section>
+            <section>
+              <h3 className="mb-2 font-semibold">Missing skills</h3>
+              <Chips items={candidate.missing ?? []} empty="Nothing missing" muted />
+            </section>
             {candidate.score !== null && b && (
-              <section className="space-y-3"><h3 className="font-semibold">Score breakdown</h3>
-                {([["Semantic", b.semantic], ["Skills", b.skills], ["Section fit", b.sectionFit]] as const).map(([label, v]) => (
+              <section className="space-y-3">
+                <h3 className="font-semibold">Score breakdown</h3>
+                {(
+                  [
+                    ["Semantic", b.semantic],
+                    ["Skills", b.skills],
+                    ["Section fit", b.sectionFit],
+                  ] as const
+                ).map(([label, v]) => (
                   <div key={label}>
-                    <div className="mb-1 flex justify-between text-sm"><span>{label}</span><span className="text-muted-foreground">{v}%</span></div>
+                    <div className="mb-1 flex justify-between text-sm">
+                      <span>{label}</span>
+                      <span className="text-muted-foreground">{v}%</span>
+                    </div>
                     <Progress value={v} className="h-1.5" />
                   </div>
                 ))}
               </section>
             )}
             {candidate.score !== null && !b && legacyBreakdown && (
-              <section className="space-y-3"><h3 className="font-semibold">Score breakdown</h3>
-                {([["Skills", legacyBreakdown.skills], ["Experience", legacyBreakdown.experience], ["Education", legacyBreakdown.education]] as const).map(([label, v]) => (
+              <section className="space-y-3">
+                <h3 className="font-semibold">Score breakdown</h3>
+                {(
+                  [
+                    ["Skills", legacyBreakdown.skills],
+                    ["Experience", legacyBreakdown.experience],
+                    ["Education", legacyBreakdown.education],
+                  ] as const
+                ).map(([label, v]) => (
                   <div key={label}>
-                    <div className="mb-1 flex justify-between text-sm"><span>{label}</span><span className="text-muted-foreground">{v}%</span></div>
+                    <div className="mb-1 flex justify-between text-sm">
+                      <span>{label}</span>
+                      <span className="text-muted-foreground">{v}%</span>
+                    </div>
                     <Progress value={v} className="h-1.5" />
                   </div>
                 ))}
               </section>
             )}
-            <section><h3 className="mb-3 font-semibold">Original resume</h3>
+            <section>
+              <h3 className="mb-3 font-semibold">Original resume</h3>
               {url ? (
                 <>
-                  <a href={url} target="_blank" rel="noreferrer" className="text-sm text-primary underline">Open {resume?.name ?? "resume"}</a>
-                  <iframe src={url} title={`Resume for ${candidate.name}`} className="mt-3 h-96 w-full rounded-2xl border bg-card" />
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm text-primary underline"
+                  >
+                    Open {resume?.name ?? "resume"}
+                  </a>
+                  <iframe
+                    src={url}
+                    title={`Resume for ${candidate.name}`}
+                    className="mt-3 h-96 w-full rounded-2xl border bg-card"
+                  />
                 </>
               ) : (
-                <p className="text-sm text-muted-foreground">{loading ? "Loading resume…" : resumeId ? "Resume file is no longer available." : "No resume attached to this demo candidate."}</p>
+                <p className="text-sm text-muted-foreground">
+                  {loading
+                    ? "Loading resume…"
+                    : resumeId
+                      ? "Resume file is no longer available."
+                      : "No resume attached to this demo candidate."}
+                </p>
               )}
             </section>
             <div className="flex gap-3">
-              <Button className="rounded-full" onClick={() => toggleShortlist(candidate.id)}><Star />{shortlist.includes(candidate.id) ? "Shortlisted" : "Shortlist"}</Button>
-              <Button variant="outline" className="rounded-full" onClick={() => reject(candidate.id)}><X />{rejected.includes(candidate.id) ? "Restore" : "Reject"}</Button>
+              <Button className="rounded-full" onClick={() => toggleShortlist(candidate.id)}>
+                <Star />
+                {shortlist.includes(candidate.id) ? "Shortlisted" : "Shortlist"}
+              </Button>
+              <Button
+                variant="outline"
+                className="rounded-full"
+                onClick={() => reject(candidate.id)}
+              >
+                <X />
+                {rejected.includes(candidate.id) ? "Restore" : "Reject"}
+              </Button>
             </div>
           </div>
         )}

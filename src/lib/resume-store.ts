@@ -11,7 +11,10 @@ function open(): Promise<IDBDatabase> {
   });
 }
 
-async function tx<T>(mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBRequest<T>): Promise<T> {
+async function tx<T>(
+  mode: IDBTransactionMode,
+  fn: (s: IDBObjectStore) => IDBRequest<T>,
+): Promise<T> {
   const db = await open();
   return new Promise((resolve, reject) => {
     const r = fn(db.transaction(STORE, mode).objectStore(STORE));
@@ -20,8 +23,10 @@ async function tx<T>(mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBReq
   });
 }
 
-export const putResume = (id: string, file: Blob) => tx("readwrite", (s) => s.put(file, id)).catch(() => undefined);
-export const getResume = (id: string) => tx<Blob | undefined>("readonly", (s) => s.get(id)).catch(() => undefined);
+export const putResume = (id: string, file: Blob) =>
+  tx("readwrite", (s) => s.put(file, id)).catch(() => undefined);
+export const getResume = (id: string) =>
+  tx<Blob | undefined>("readonly", (s) => s.get(id)).catch(() => undefined);
 export const deleteResumes = async (ids: string[]) => {
   for (const id of ids) await tx("readwrite", (s) => s.delete(id)).catch(() => undefined);
 };

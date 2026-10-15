@@ -15,8 +15,12 @@ function ShortlistPage() {
       <h1 className="font-display text-4xl font-bold">Shortlist</h1>
       {empty ? (
         <div className="py-16 text-center">
-          <p className="text-muted-foreground">No candidates yet. Screen some resumes to see them ranked here.</p>
-          <Button asChild className="mt-5 rounded-full"><Link to="/">Screen resumes</Link></Button>
+          <p className="text-muted-foreground">
+            No candidates yet. Screen some resumes to see them ranked here.
+          </p>
+          <Button asChild className="mt-5 rounded-full">
+            <Link to="/">Screen resumes</Link>
+          </Button>
         </div>
       ) : (
         <CandidateTable />

@@ -1,20 +1,17 @@
-# Routes
+# Application routes
 
-This Vite SPA uses TanStack Router with file-based route modules. Each page in
-this directory is registered in `src/routeTree.gen.ts`; the root route wraps
-the pages in `src/routes/__root.tsx`.
+The TanStack Router route modules are:
 
-## Conventions
+| File | URL | Purpose |
+| --- | --- | --- |
+| `index.tsx` | `/` | Start a resume screening |
+| `jobs.tsx` | `/jobs` | Manage saved jobs |
+| `candidates.tsx` | `/candidates` | Browse candidates across jobs |
+| `shortlist.tsx` | `/shortlist` | Review and filter shortlisted candidates |
+| `settings.tsx` | `/settings` | Profile, scoring weights, and local data |
+| `__root.tsx` | Root layout | Shared app shell and route outlet |
 
-| File | URL |
-| --- | --- |
-| `index.tsx` | `/` |
-| `about.tsx` | `/about` |
-| `users/index.tsx` | `/users` |
-| `users/$id.tsx` | `/users/:id` (dynamic) |
-| `posts/{-$category}.tsx` | `/posts/:category?` (optional segment) |
-| `files/$.tsx` | `/files/*` (splat) |
-| `_layout.tsx` | layout route (renders children via `<Outlet />`) |
-| `__root.tsx` | app shell — renders the active route with `<Outlet />` |
-
-When adding or renaming a route, update `src/routeTree.gen.ts` to register it.
+`src/routeTree.gen.ts` is maintained by hand in this project; there is no
+TanStack Router Vite plugin generating it. When adding, removing, or renaming a
+route, update its imports, route registrations, and route type declarations
+alongside the route module. Keep the route matching test in `src/test/` passing.

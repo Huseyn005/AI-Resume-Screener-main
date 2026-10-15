@@ -15,7 +15,9 @@ export function CandidateCard({ c, rank }: { c: Candidate; rank: number }) {
   const [open, setOpen] = useState(false);
   const t = tone[c.score === null ? "low" : levelOf(c.score)];
   const saved = shortlist.includes(c.id);
-  const filename = [...files, ...jobs.flatMap((j) => j.files)].find((f) => f.id === c.resumeId)?.name;
+  const filename = [...files, ...jobs.flatMap((j) => j.files)].find(
+    (f) => f.id === c.resumeId,
+  )?.name;
   const subtitle = [c.role, c.experience].filter(Boolean).join(" · ");
   const statusCard = c.status === "needs_ocr" || c.status === "error";
 
@@ -25,9 +27,25 @@ export function CandidateCard({ c, rank }: { c: Candidate; rank: number }) {
         {c.score !== null && (
           <div className={cn("relative grid size-14 shrink-0 place-items-center", t.ring)}>
             <svg viewBox="0 0 36 36" className="absolute inset-0 -rotate-90">
-              <circle cx="18" cy="18" r="15.5" fill="none" stroke="currentColor" strokeOpacity=".15" strokeWidth="3" />
-              <circle cx="18" cy="18" r="15.5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"
-                strokeDasharray={`${(c.score / 100) * 97.4} 97.4`} />
+              <circle
+                cx="18"
+                cy="18"
+                r="15.5"
+                fill="none"
+                stroke="currentColor"
+                strokeOpacity=".15"
+                strokeWidth="3"
+              />
+              <circle
+                cx="18"
+                cy="18"
+                r="15.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeDasharray={`${(c.score / 100) * 97.4} 97.4`}
+              />
             </svg>
             <span className="font-display text-base font-bold text-foreground">{c.score}</span>
           </div>
@@ -37,10 +55,24 @@ export function CandidateCard({ c, rank }: { c: Candidate; rank: number }) {
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold text-muted-foreground">#{rank}</span>
             <h3 className="truncate font-display text-lg font-semibold capitalize">{c.name}</h3>
-            {c.score !== null && <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", t.chip)}>{levelLabel[levelOf(c.score)]}</span>}
+            {c.score !== null && (
+              <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-semibold", t.chip)}>
+                {levelLabel[levelOf(c.score)]}
+              </span>
+            )}
             <CandidateStatus candidate={c} part="badges" />
           </div>
-          {filename && <p title={filename} className={cn("text-xs text-muted-foreground", statusCard ? "break-words [overflow-wrap:anywhere]" : "truncate")}>{filename}</p>}
+          {filename && (
+            <p
+              title={filename}
+              className={cn(
+                "text-xs text-muted-foreground",
+                statusCard ? "break-words [overflow-wrap:anywhere]" : "truncate",
+              )}
+            >
+              {filename}
+            </p>
+          )}
           {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
         </button>
 
@@ -49,24 +81,39 @@ export function CandidateCard({ c, rank }: { c: Candidate; rank: number }) {
           aria-label={saved ? "Remove from shortlist" : "Add to shortlist"}
           className={cn(
             "grid size-10 place-items-center rounded-full border transition-colors",
-            saved ? "border-accent bg-accent text-accent-foreground" : "hover:border-accent hover:text-accent",
+            saved
+              ? "border-accent bg-accent text-accent-foreground"
+              : "hover:border-accent hover:text-accent",
           )}
         >
           <Star className={cn("size-5", saved && "fill-current")} />
         </button>
-        <button onClick={() => setOpen(!open)} aria-label="Show details" className="text-muted-foreground">
+        <button
+          onClick={() => setOpen(!open)}
+          aria-label="Show details"
+          className="text-muted-foreground"
+        >
           <ChevronDown className={cn("size-5 transition-transform", open && "rotate-180")} />
         </button>
       </div>
 
-      {statusCard && <div className="mt-3"><CandidateStatus candidate={c} part="message" /></div>}
+      {statusCard && (
+        <div className="mt-3">
+          <CandidateStatus candidate={c} part="message" />
+        </div>
+      )}
 
       {open && (
         <div className="mt-4 space-y-3 border-t pt-4 text-sm">
           <p>{c.summary}</p>
           <div className="flex flex-wrap gap-2">
             {c.skills.map((s) => (
-              <span key={s} className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">{s}</span>
+              <span
+                key={s}
+                className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground"
+              >
+                {s}
+              </span>
             ))}
           </div>
         </div>

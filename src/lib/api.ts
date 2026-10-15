@@ -41,10 +41,18 @@ export async function analyzeResumes(jd: string, files: File[]): Promise<unknown
 
   if (!response.ok) {
     const body: unknown = await response.json().catch(() => null);
-    const message = typeof body === "object" && body !== null
-      ? "detail" in body ? body.detail : "error" in body ? body.error : "message" in body ? body.message : undefined
-      : undefined;
-    const detail = typeof message === "string" ? message : message === undefined ? "" : JSON.stringify(message);
+    const message =
+      typeof body === "object" && body !== null
+        ? "detail" in body
+          ? body.detail
+          : "error" in body
+            ? body.error
+            : "message" in body
+              ? body.message
+              : undefined
+        : undefined;
+    const detail =
+      typeof message === "string" ? message : message === undefined ? "" : JSON.stringify(message);
     throw new Error(detail || `Analysis failed with status ${response.status}.`);
   }
 

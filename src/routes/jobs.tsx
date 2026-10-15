@@ -3,10 +3,8 @@ import { Copy, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { average, useScreening } from "@/lib/screening";
-import { pageHead } from "@/lib/page-head";
 
 export const Route = createFileRoute("/jobs")({
-  head: () => pageHead("Saved jobs", "Reopen saved job descriptions and their screened candidates."),
   component: JobsPage,
 });
 

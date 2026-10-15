@@ -1,9 +1,8 @@
 # Routes
 
-TanStack Start uses **file-based routing**. Every `.tsx` file in this directory
-defines a route. Do **not** create `src/pages/`, `src/routes/_app/index.tsx`, or
-`app/layout.tsx` — those are Next.js / Remix conventions. The only root layout
-is `src/routes/__root.tsx`.
+This Vite SPA uses TanStack Router with file-based route modules. Each page in
+this directory is registered in `src/routeTree.gen.ts`; the root route wraps
+the pages in `src/routes/__root.tsx`.
 
 ## Conventions
 
@@ -12,10 +11,10 @@ is `src/routes/__root.tsx`.
 | `index.tsx` | `/` |
 | `about.tsx` | `/about` |
 | `users/index.tsx` | `/users` |
-| `users/$id.tsx` | `/users/:id` (dynamic — bare `$`, no curly braces) |
+| `users/$id.tsx` | `/users/:id` (dynamic) |
 | `posts/{-$category}.tsx` | `/posts/:category?` (optional segment) |
-| `files/$.tsx` | `/files/*` (splat — read via `_splat` param, never `*`) |
+| `files/$.tsx` | `/files/*` (splat) |
 | `_layout.tsx` | layout route (renders children via `<Outlet />`) |
-| `__root.tsx` | app shell — wraps every page; preserve `<Outlet />` |
+| `__root.tsx` | app shell — renders the active route with `<Outlet />` |
 
-`routeTree.gen.ts` is auto-generated. Don't edit it by hand.
+When adding or renaming a route, update `src/routeTree.gen.ts` to register it.

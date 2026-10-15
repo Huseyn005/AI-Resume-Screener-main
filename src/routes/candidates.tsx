@@ -2,10 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { CandidateTable } from "@/components/candidate-table";
 import { useScreening } from "@/lib/screening";
-import { pageHead } from "@/lib/page-head";
 
 export const Route = createFileRoute("/candidates")({
-  head: () => pageHead("All candidates", "Search every candidate across all of your saved jobs."),
   component: CandidatesPage,
 });
 

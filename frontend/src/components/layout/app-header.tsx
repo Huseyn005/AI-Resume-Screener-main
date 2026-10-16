@@ -59,6 +59,11 @@ export function AppHeader() {
           </span>
           shortlist<span className="text-accent">.</span>
         </Link>
+        {import.meta.env["VITE_USE_MOCK"] === "true" && (
+          <span className="rounded-full bg-warning-soft px-2.5 py-1 text-xs font-semibold text-foreground">
+            Demo mode
+          </span>
+        )}
         <nav className="hidden items-center gap-1 md:flex">{links()}</nav>
         <div className="flex items-center gap-2">
           <DropdownMenu>

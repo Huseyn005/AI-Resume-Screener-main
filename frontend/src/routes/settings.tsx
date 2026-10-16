@@ -22,6 +22,7 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsPage() {
+  const demoMode = import.meta.env["VITE_USE_MOCK"] === "true";
   const { profile, setProfile, weights, setWeights, clearData } = useScreening();
   const [name, setName] = useState(profile.name);
   const [email, setEmail] = useState(profile.email);
@@ -40,12 +41,12 @@ function SettingsPage() {
         className="space-y-8"
         onSubmit={(e) => {
           e.preventDefault();
-          if (total !== 100) {
+          if (demoMode && total !== 100) {
             toast.error("Scoring weights must add up to 100%.");
             return;
           }
           setProfile({ name: name.trim(), email: email.trim() });
-          setWeights(draft);
+          if (demoMode) setWeights(draft);
           toast.success("Settings saved");
         }}
       >
@@ -77,31 +78,39 @@ function SettingsPage() {
         </section>
         <section className="space-y-6 border-b pb-8">
           <h2 className="font-display text-xl font-semibold">Scoring weights</h2>
-          {(Object.keys(draft) as (keyof Weights)[]).map((key) => (
-            <div key={key}>
-              <div className="mb-3 flex justify-between text-sm">
-                <label htmlFor={`w-${key}`} className="capitalize">
-                  {key}
-                </label>
-                <span>{draft[key]}%</span>
-              </div>
-              <Slider
-                id={`w-${key}`}
-                aria-label={`${key} weight`}
-                min={0}
-                max={100}
-                step={5}
-                value={[draft[key]]}
-                onValueChange={(v) => setDraft((p) => ({ ...p, [key]: v[0] ?? 0 }))}
-              />
-            </div>
-          ))}
-          <p className="text-sm text-muted-foreground">
-            Total {total}%{total !== 100 ? " · must equal 100%" : ""}. Applies the next time you
-            check resumes.
-          </p>
+          {demoMode ? (
+            <>
+              {(Object.keys(draft) as (keyof Weights)[]).map((key) => (
+                <div key={key}>
+                  <div className="mb-3 flex justify-between text-sm">
+                    <label htmlFor={`w-${key}`} className="capitalize">
+                      {key}
+                    </label>
+                    <span>{draft[key]}%</span>
+                  </div>
+                  <Slider
+                    id={`w-${key}`}
+                    aria-label={`${key} weight`}
+                    min={0}
+                    max={100}
+                    step={5}
+                    value={[draft[key]]}
+                    onValueChange={(v) => setDraft((p) => ({ ...p, [key]: v[0] ?? 0 }))}
+                  />
+                </div>
+              ))}
+              <p className="text-sm text-muted-foreground">
+                Total {total}%{total !== 100 ? " · must equal 100%" : ""}. Applies the next time you
+                check resumes.
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Live scores come from the server model. Scoring weights are configured on the server.
+            </p>
+          )}
         </section>
-        <Button className="rounded-full" disabled={total !== 100}>
+        <Button className="rounded-full" disabled={demoMode && total !== 100}>
           Save changes
         </Button>
       </form>

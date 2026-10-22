@@ -1,8 +1,10 @@
 # Architecture
 
 The repository has two deployable parts: a browser-only React/Vite SPA in
-`frontend/` and a FastAPI API in `backend/`. The SPA is hosted on Vercel; backend
-hosting has not been set up in this repository.
+`frontend/` and a FastAPI API in `backend/`. The SPA is configured for Vercel,
+and the backend is packaged as a Docker image for deployment to a
+Docker-capable host. Hosting infrastructure and live deployment configuration
+are managed outside this repository.
 
 ```mermaid
 flowchart LR

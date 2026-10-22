@@ -11,9 +11,22 @@ def model_name(settings: Settings) -> str:
     return settings.model_path()
 
 
-def load_model(settings: Settings) -> Any:
+def load_model(settings: Settings, model_path: str | None = None) -> Any:
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    return SentenceTransformer(model_name(settings), device=device)
+    name = model_path or model_name(settings)
+    try:
+        return SentenceTransformer(name, device=device)
+    except FileNotFoundError as exc:
+        raise RuntimeError(
+            f"Embedding model '{name}' was not found in the local cache. "
+            "The model must be baked into the image at build time; "
+            "EMBED_MODEL must not be overridden on the host."
+        ) from exc
+    except OSError as exc:
+        raise RuntimeError(
+            f"Could not access embedding model '{name}' because of an OS "
+            f"error ({type(exc).__name__}): {exc}"
+        ) from exc
 
 
 def embedding_dim(model: Any) -> int:

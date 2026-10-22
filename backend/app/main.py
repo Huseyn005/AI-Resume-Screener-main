@@ -72,6 +72,7 @@ ALLOWED_TYPES = {
 JD_MIN, JD_MAX = 50, 10000
 MAX_FILES, MIN_FILES = 30, 1
 RATE_WINDOW_SECONDS = 60
+MAX_TRACKED_CLIENTS = 10_000
 
 
 @dataclass
@@ -103,6 +104,7 @@ async def lifespan(app: FastAPI):
     app.state.rate_limit_hits = {}
     app.state.rate_limit_lock = asyncio.Lock()
     app.state.model_name = model_name(settings)
+    app.state.model_source = settings.model_source()
     app.state.model = load_model(settings)
     app.state.calibrator = (
         load_calibrator(settings)
@@ -110,6 +112,14 @@ async def lifespan(app: FastAPI):
     )
     app.state.calibrator_loaded = app.state.calibrator is not None
     app.state.lexicon = load_skills()
+    log.info(
+        "model startup source=%s name=%s calibrator_loaded=%s",
+        settings.model_source(),
+        app.state.model_name,
+        "yes" if app.state.calibrator_loaded else "no",
+    )
+    if not app.state.calibrator_loaded:
+        log.warning("semantic calibrator is off")
     yield
     app.state.model = None
 
@@ -127,6 +137,19 @@ def create_app() -> FastAPI:
                 getattr(request.app.state, "settings", None)
                 or get_settings()
             )
+            if active_settings.log_level.upper() == "DEBUG":
+                client, forwarded_count = _resolved_client(
+                    request, active_settings
+                )
+                client_hash = hashlib.sha256(
+                    client.encode("utf-8", errors="replace")
+                ).hexdigest()[:10]
+                log.debug(
+                    "analyze client forwarded_for_entries=%d "
+                    "client_hash=%s",
+                    forwarded_count,
+                    client_hash,
+                )
             content_length = request.headers.get("content-length")
             if content_length is not None:
                 try:
@@ -164,6 +187,9 @@ async def health() -> HealthResponse:
         status="ok",
         model=getattr(app.state, "model_name", ""),
         calibrator_loaded=getattr(app.state, "calibrator_loaded", False),
+        model_source=getattr(
+            app.state, "model_source", get_settings().model_source()
+        ),
     )
 
 
@@ -354,11 +380,7 @@ async def _rate_limit_retry_after(
     limit = settings.rate_limit_per_minute
     if limit == 0:
         return None
-    forwarded_for = request.headers.get("x-forwarded-for", "")
-    client = (
-        forwarded_for.split(",", maxsplit=1)[0].strip()
-        or (request.client.host if request.client else "unknown")
-    )
+    client, _forwarded_count = _resolved_client(request, settings)
     hits = app.state.rate_limit_hits
     now = time.monotonic()
     async with app.state.rate_limit_lock:
@@ -370,6 +392,12 @@ async def _rate_limit_retry_after(
                 known_hits.popleft()
             if not known_hits:
                 del hits[known_client]
+        while client not in hits and len(hits) >= MAX_TRACKED_CLIENTS:
+            least_recent_client = min(
+                hits,
+                key=lambda known_client: hits[known_client][-1],
+            )
+            del hits[least_recent_client]
         client_hits = hits.setdefault(client, deque())
         if len(client_hits) >= limit:
             return max(
@@ -377,6 +405,24 @@ async def _rate_limit_retry_after(
             )
         client_hits.append(now)
     return None
+
+
+def _resolved_client(
+        request: Request,
+        settings: Settings,
+) -> tuple[str, int]:
+    forwarded_values = [
+        value.strip()
+        for value in request.headers.get("x-forwarded-for", "").split(",")
+        if value.strip()
+    ]
+    forwarded_count = len(forwarded_values)
+    trusted_count = settings.trusted_proxy_count
+    if trusted_count and forwarded_count >= trusted_count:
+        client = forwarded_values[-trusted_count]
+    else:
+        client = request.client.host if request.client else "unknown"
+    return client, forwarded_count
 
 
 def _with_explanation(

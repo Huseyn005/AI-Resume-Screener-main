@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import logging
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -9,6 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 import pymupdf
 import pytest
+from fastapi import Request
 from fastapi.testclient import TestClient
 
 from app import main
@@ -109,7 +111,148 @@ def test_rate_limit_returns_429_with_retry_after(client: TestClient) -> None:
     assert second.status_code == 429
     assert int(second.headers["retry-after"]) >= 1
     assert second.json() == {"detail": "Analysis rate limit exceeded"}
-    assert client.get("/health").status_code == 200
+    health = client.get("/health")
+    assert health.status_code == 200
+    assert health.json()["model_source"] == "base"
+
+
+def test_debug_request_log_hashes_client_ip(
+        client: TestClient,
+        caplog: pytest.LogCaptureFixture,
+) -> None:
+    client.app.state.settings.log_level = "DEBUG"
+    with caplog.at_level(logging.DEBUG, logger="screener"):
+        response = client.post(
+            "/analyze",
+            headers={"X-Forwarded-For": "198.51.100.42"},
+            data={"job_description": JD},
+            files=[
+                ("resumes", (
+                    "resume.pdf", make_pdf(RESUME), "application/pdf"
+                )),
+            ],
+        )
+
+    assert response.status_code == 200
+    assert "forwarded_for_entries=1" in caplog.text
+    assert "client_hash=" in caplog.text
+    assert "198.51.100.42" not in caplog.text
+
+
+def _request(x_forwarded_for: str | None, host: str = "proxy") -> Request:
+    headers = []
+    if x_forwarded_for is not None:
+        headers.append(
+            (b"x-forwarded-for", x_forwarded_for.encode("ascii"))
+        )
+    return Request({
+        "type": "http",
+        "asgi": {"version": "3.0"},
+        "http_version": "1.1",
+        "method": "POST",
+        "scheme": "http",
+        "path": "/analyze",
+        "raw_path": b"/analyze",
+        "query_string": b"",
+        "headers": headers,
+        "client": (host, 1234),
+        "server": ("test", 80),
+    })
+
+
+def test_rate_limit_ignores_spoofed_leftmost_forwarded_value(
+        client: TestClient,
+) -> None:
+    settings = client.app.state.settings
+    settings.rate_limit_per_minute = 1
+    settings.trusted_proxy_count = 1
+    request_one = _request("spoofed-one, actual-client")
+    request_two = _request("spoofed-two, actual-client")
+
+    assert asyncio.run(
+        main._rate_limit_retry_after(request_one, settings)
+    ) is None
+    assert asyncio.run(
+        main._rate_limit_retry_after(request_two, settings)
+    ) is not None
+    assert set(client.app.state.rate_limit_hits) == {"actual-client"}
+
+
+def test_rate_limit_uses_nth_forwarded_value_from_the_right(
+        client: TestClient,
+) -> None:
+    settings = client.app.state.settings
+    settings.trusted_proxy_count = 2
+
+    assert asyncio.run(
+        main._rate_limit_retry_after(
+            _request("untrusted, selected-client, nearest-proxy"),
+            settings,
+        )
+    ) is None
+    assert set(client.app.state.rate_limit_hits) == {"selected-client"}
+
+
+def test_rate_limit_missing_forwarded_header_uses_client_host(
+        client: TestClient,
+) -> None:
+    settings = client.app.state.settings
+    settings.trusted_proxy_count = 1
+
+    assert asyncio.run(
+        main._rate_limit_retry_after(_request(None, "direct-client"), settings)
+    ) is None
+    assert set(client.app.state.rate_limit_hits) == {"direct-client"}
+
+
+def test_rate_limit_fewer_forwarded_entries_falls_back_to_client_host(
+        client: TestClient,
+) -> None:
+    settings = client.app.state.settings
+    settings.trusted_proxy_count = 3
+
+    assert asyncio.run(
+        main._rate_limit_retry_after(
+            _request("one, two", "fallback-client"),
+            settings,
+        )
+    ) is None
+    assert set(client.app.state.rate_limit_hits) == {"fallback-client"}
+
+
+def test_zero_trusted_proxies_ignores_forwarded_header(
+        client: TestClient,
+) -> None:
+    settings = client.app.state.settings
+    settings.trusted_proxy_count = 0
+
+    assert asyncio.run(
+        main._rate_limit_retry_after(
+            _request("spoofed-client", "socket-client"),
+            settings,
+        )
+    ) is None
+    assert set(client.app.state.rate_limit_hits) == {"socket-client"}
+
+
+def test_rate_limit_client_tracking_is_capped_and_evicts_oldest(
+        client: TestClient,
+) -> None:
+    settings = client.app.state.settings
+    now = time.monotonic()
+    hits = client.app.state.rate_limit_hits
+    hits.update({
+        f"client-{index}": main.deque([now - (10_000 - index) / 1000])
+        for index in range(main.MAX_TRACKED_CLIENTS)
+    })
+
+    asyncio.run(
+        main._rate_limit_retry_after(_request(None, "new-client"), settings)
+    )
+
+    assert len(hits) == main.MAX_TRACKED_CLIENTS
+    assert "client-0" not in hits
+    assert "new-client" in hits
 
 
 def test_full_analysis_queue_returns_503(
@@ -212,6 +355,24 @@ def test_cors_preflight_accepts_explicit_and_regex_origins(
         },
     )
     assert denied.status_code == 400
+
+
+def test_default_allowed_origins_are_original(
+        monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("ALLOWED_ORIGINS", raising=False)
+    monkeypatch.delenv("ALLOWED_ORIGIN_REGEX", raising=False)
+    settings = Settings(_env_file=None)
+    assert settings.origin_list() == [
+        "https://pushcv.vercel.app",
+        "https://statcv.vercel.app",
+        "https://pullcv.vercel.app",
+        "https://taphire.vercel.app",
+        "https://dragcv.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:8080",
+    ]
+    assert settings.allowed_origin_regex == ""
 
 
 def test_health_stays_responsive_while_extraction_is_slow(

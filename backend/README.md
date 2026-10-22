@@ -33,6 +33,9 @@ comma-separated list of allowed browser origins for your deployment.
 example `^https://pushcv(-[a-z0-9-]+)*\.vercel\.app$`.
 `EMBED_MODEL` defaults to `sentence-transformers/all-MiniLM-L6-v2`; the model
 is baked into the Docker image at build time and used offline at runtime.
+Fine-tuned models are trained locally, uploaded with `calibrator.pkl` to a
+private Hugging Face model repo, and downloaded when the Space starts.
+Training never runs on the server. Do not override `EMBED_MODEL` on the host.
 Resource and rate-limit defaults are documented in
 [docs/deployment.md](../docs/deployment.md).
 
@@ -156,5 +159,5 @@ python -m pytest
 The first training command is a fast smoke test; the second performs the
 configured training run. Evaluation writes `ml/results.json`,
 `ml/REPORT.md`, and `ml/score_distribution.png`. Training and calibration
-write `models/finetuned/` and `models/calibrator.pkl`, which the API loads
-automatically when present.
+write `models/finetuned/` (including `calibrator.pkl`), which can be uploaded
+as one folder to the private model repo used by the deployment.

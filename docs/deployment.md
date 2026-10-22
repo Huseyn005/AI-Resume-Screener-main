@@ -26,7 +26,7 @@ this dashboard fallback:
 
 ## FastAPI backend
 
-Build and run the CPU-only image from the repository root:
+Build and run the CPU-only image from the repository root for local testing:
 
 ```powershell
 Copy-Item backend\.env.example backend\.env
@@ -34,17 +34,38 @@ docker build -t shortlist-backend backend
 docker run --rm -p 8000:8000 --env-file backend\.env shortlist-backend
 ```
 
-The image pre-downloads `EMBED_MODEL` and runs offline; the default is
-`sentence-transformers/all-MiniLM-L6-v2`. To bake a fine-tuned model from the
-Hugging Face Hub, pass `--build-arg EMBED_MODEL=owner/model-name`. For local
-fine-tuned weights, include `backend/models/finetuned/` in the build context
-(remove its `.dockerignore` exclusion) and add
-`COPY models/finetuned/ ./models/finetuned/` to the Dockerfile. Do not copy
-models by default. Local GPU training uses `requirements-ml.txt` followed by
-`requirements.txt`; the server and CI use CPU torch 2.9.1 followed by
-`requirements.txt`.
+The image bakes `sentence-transformers/all-MiniLM-L6-v2` and runs the app
+offline. Do not override `EMBED_MODEL` on the host: a different model must be
+baked into a new image. The Space entrypoint performs any configured private
+fine-tuned model download before setting the app process offline. It runs one
+Uvicorn worker and does not trust Uvicorn proxy headers; the application
+resolves the client address itself for rate limiting.
 
-| Environment variable | Default | Purpose |
+### Private fine-tuned model updates
+
+Training and calibration run locally, never on the server. The training output
+is `backend\models\finetuned`; it contains the SentenceTransformer model and
+`calibrator.pkl`. Upload the complete folder to a private Hugging Face model
+repo, then restart the Space. Model updates do not require a Docker rebuild or
+a code change:
+
+```powershell
+Set-Location backend
+python -m ml.train
+python -m ml.calibrate
+python -m app.fetch_model --check models\finetuned
+Set-Location ..
+hf upload YOUR_USER/resume-screener-model backend\models\finetuned .
+```
+
+Run the local checker before every upload. It validates the folder manifest,
+Transformer files, and root `calibrator.pkl` without downloading or loading the
+model. If an older training run left `models/calibrator.pkl`, copy it into
+`models/finetuned/` (or a staging copy of that folder) before running `hf upload`.
+
+Set these Space variables/secrets:
+
+| Variable | Default | Purpose |
 | --- | --- | --- |
 | `ALLOWED_ORIGINS` | `https://pushcv.vercel.app,https://statcv.vercel.app,https://pullcv.vercel.app,https://taphire.vercel.app,https://dragcv.vercel.app,http://localhost:5173,http://localhost:8080` | Comma-separated exact browser origins |
 | `ALLOWED_ORIGIN_REGEX` | empty | Optional origin regex, e.g. `^https://pushcv(-[a-z0-9-]+)*\.vercel\.app$` |
@@ -58,9 +79,26 @@ models by default. Local GPU training uses `requirements-ml.txt` followed by
 | `QUEUE_TIMEOUT_SECONDS` | `30` | Wait time for an analysis slot |
 | `RATE_LIMIT_PER_MINUTE` | `20` | Per-client analyze limit; `0` disables it |
 | `LOG_LEVEL` | `INFO` | Python logging level |
+| `FINETUNED_REPO` | empty | Private Hub repo ID, e.g. `YOUR_USER/resume-screener-model`; empty makes no startup download (a complete local model folder is still used if present) |
+| `FINETUNED_REVISION` | empty | Hub revision; empty uses latest. Pin an approved model to a commit hash |
+| `HF_TOKEN` | empty | Space secret containing a read-only token with access to the private model repo; never put it in source control |
+| `TRUSTED_PROXY_COUNT` | `1` | Selects the trusted client address from the right of `X-Forwarded-For`; `0` ignores that header |
 
 For production, set `ALLOWED_ORIGINS` to the actual frontend origin(s) that
 should call the API.
+
+To determine `TRUSTED_PROXY_COUNT` on the Space:
+
+1. Temporarily set `LOG_LEVEL=DEBUG`.
+2. Send one `/analyze` request **without** an `X-Forwarded-For` header.
+3. Read the `forwarded_for_entries` count in the request's debug log.
+4. Set `TRUSTED_PROXY_COUNT` to that count, then return `LOG_LEVEL` to `INFO`.
+
+The log includes only the entry count and a short hash of the resolved client,
+never the raw IP. A wrong proxy count weakens per-client enforcement: a value
+that is too high can prevent selecting the actual client address and may allow
+the intended limit to be bypassed in a proxy chain; `0` or a value that is
+too low can make visitors share a limit.
 
 One Uvicorn process is intentional: every worker would load another embedding
 model and copy of the 10k-skill lexicon, multiplying memory use. Host the
@@ -68,8 +106,8 @@ container on a Docker-capable service with enough RAM for CPU torch, MiniLM,
 and request processing; terminate TLS with HTTPS, provide the environment
 variables, and configure the platform health probe at `/health`. Allow the
 image's 180-second Docker health-check start period for loading the model and
-lexicon.
-Use a keep-alive or minimum-instance option if cold starts are undesirable.
+lexicon. Use a keep-alive or minimum-instance option if cold starts are
+undesirable.
 
 Set `VITE_API_URL` in the Vercel Production and Preview environments to the
 public HTTPS API base URL, then redeploy because Vite embeds it at build time.

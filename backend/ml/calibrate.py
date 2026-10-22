@@ -2,19 +2,15 @@ from __future__ import annotations
 import joblib
 import numpy as np
 from sklearn.isotonic import IsotonicRegression
-from app.config import get_settings
+from app.config import CALIBRATOR_PATH, FINETUNED_DIR, get_settings
 from app.embed import load_model
 from ml.common import (
-    BACKEND_ROOT,
     DATA_DIR,
     encode_chunks,
     read_jsonl,
     semantic_scores,
 )
 from ml.evaluate import REPORT_PATH
-
-CALIBRATOR_PATH = BACKEND_ROOT / "models" / "calibrator.pkl"
-
 
 def reliability_rows(
         predicted: np.ndarray,
@@ -80,7 +76,7 @@ def main() -> None:
     queries = read_jsonl(DATA_DIR / "val_jds.jsonl")
     if not val or not queries:
         raise ValueError("Validation resumes and JDs are required")
-    model = load_model(get_settings())
+    model = load_model(get_settings(), model_path=str(FINETUNED_DIR))
     _chunks, embeddings = encode_chunks(model, val)
     semantic: list[float] = []
     observed: list[int] = []

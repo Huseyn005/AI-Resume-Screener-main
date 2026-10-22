@@ -22,14 +22,13 @@ COPY data/ ./data/
 
 RUN mkdir -p "${HF_HOME}" \
     && python -c "from sentence_transformers import SentenceTransformer; import os; SentenceTransformer(os.environ['EMBED_MODEL'], device='cpu')" \
-    && useradd --create-home --uid 10001 appuser \
+    && mkdir -p /app/backend/models/finetuned \
+    && useradd --create-home --uid 1000 appuser \
     && chown -R appuser:appuser /app "${HF_HOME}"
-
-ENV HF_HUB_OFFLINE=1
 
 USER appuser
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=180s --retries=3 \
     CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('PORT', '8000') + '/health', timeout=4)" || exit 1
 
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'
+CMD ["python", "-m", "app.serve"]

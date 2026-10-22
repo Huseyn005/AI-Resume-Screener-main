@@ -3,10 +3,11 @@ from math import isclose
 from pathlib import Path
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from app.model_files import model_folder_issues
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 FINETUNED_DIR = BACKEND_ROOT / "models" / "finetuned"
-CALIBRATOR_PATH = BACKEND_ROOT / "models" / "calibrator.pkl"
+CALIBRATOR_PATH = FINETUNED_DIR / "calibrator.pkl"
 
 
 class Settings(BaseSettings):
@@ -23,6 +24,9 @@ class Settings(BaseSettings):
     )
     allowed_origin_regex: str = ""
     log_level: str = "INFO"
+    finetuned_repo: str = ""
+    finetuned_revision: str = ""
+    hf_token: str = ""
     semantic_weight: float = 0.5
     skill_weight: float = 0.40
     section_weight: float = 0.10
@@ -46,6 +50,7 @@ class Settings(BaseSettings):
     max_concurrent_analyses: int = 2
     queue_timeout_seconds: float = 30.0
     rate_limit_per_minute: int = 20
+    trusted_proxy_count: int = 1
     min_text_chars: int = 200
     hidden_font_size: float = 2.0
 
@@ -65,6 +70,8 @@ class Settings(BaseSettings):
             raise ValueError("queue_timeout_seconds cannot be negative")
         if self.rate_limit_per_minute < 0:
             raise ValueError("rate_limit_per_minute cannot be negative")
+        if self.trusted_proxy_count < 0:
+            raise ValueError("trusted_proxy_count cannot be negative")
         if self.log_level.upper() not in {
             "CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG",
         }:
@@ -96,12 +103,22 @@ class Settings(BaseSettings):
                 if p.strip()]
 
     def model_path(self) -> str:
-        if FINETUNED_DIR.is_dir() and any(FINETUNED_DIR.iterdir()):
+        if FINETUNED_DIR.is_dir() and not model_folder_issues(
+            FINETUNED_DIR, CALIBRATOR_PATH.name
+        ):
             return str(FINETUNED_DIR)
         return self.embed_model
 
     def calibrator_path(self) -> Path:
         return CALIBRATOR_PATH
+
+    def model_source(self) -> str:
+        if self.finetuned_repo:
+            revision = self.finetuned_revision or "latest"
+            return f"{self.finetuned_repo}@{revision}"
+        if self.model_path() == str(FINETUNED_DIR):
+            return "local-finetuned"
+        return "base"
 
 
 @lru_cache

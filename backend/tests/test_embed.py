@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
+from app import embed
+from app.config import Settings
 from app.embed import encode_sync
 from app.skills import noun_phrases
 
@@ -68,3 +71,47 @@ def test_noun_phrase_generation_is_bounded() -> None:
     assert len(phrases) <= 256
     assert all(len(phrase) <= 128 for phrase in phrases)
     assert noun_phrases("x" * 10000) == []
+
+
+@pytest.mark.parametrize(
+    ("error", "expected"),
+    [
+        (FileNotFoundError("missing"), "must be baked into the image"),
+        (PermissionError("denied"), "PermissionError"),
+    ],
+)
+def test_model_load_distinguishes_missing_model_from_os_errors(
+        monkeypatch: pytest.MonkeyPatch,
+        error: OSError,
+        expected: str,
+) -> None:
+    monkeypatch.setattr(embed.torch.cuda, "is_available", lambda: False)
+    monkeypatch.setattr(
+        embed, "model_name", lambda _settings: "local-model"
+    )
+
+    def fail_load(*_args, **_kwargs):
+        raise error
+
+    monkeypatch.setattr(embed, "SentenceTransformer", fail_load)
+    with pytest.raises(RuntimeError, match=expected):
+        embed.load_model(Settings(_env_file=None))
+
+
+def test_model_load_accepts_explicit_training_model_path(
+        monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    loaded = []
+    monkeypatch.setattr(embed.torch.cuda, "is_available", lambda: False)
+    monkeypatch.setattr(
+        embed,
+        "SentenceTransformer",
+        lambda name, device: loaded.append((name, device)) or object(),
+    )
+
+    embed.load_model(
+        Settings(_env_file=None, embed_model="base-model"),
+        model_path="local-finetuned-output",
+    )
+
+    assert loaded == [("local-finetuned-output", "cpu")]

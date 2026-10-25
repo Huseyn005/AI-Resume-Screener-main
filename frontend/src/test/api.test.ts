@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { analyzeResumes } from "@/features/screening/api";
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
@@ -52,5 +53,67 @@ describe("analyzeResumes", () => {
     await expect(analyzeResumes("Test job description", [])).rejects.toThrow(
       `Backend not reachable at ${baseUrl}`,
     );
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("retries a transient network failure once before succeeding", async () => {
+    vi.stubEnv("VITE_API_URL", "https://screening.example.test");
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockRejectedValueOnce(new TypeError("Network error"))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ results: [] })));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(analyzeResumes("Test job description", [])).resolves.toEqual({
+      results: [],
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([502, 503, 504])("retries a %i response once", async (status) => {
+    vi.stubEnv("VITE_API_URL", "https://screening.example.test");
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response("transient failure", { status }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ results: [] })));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(analyzeResumes("Test job description", [])).resolves.toEqual({
+      results: [],
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    [413, "The uploaded files exceed the server's size limit."],
+    [429, "Too many analyses were submitted."],
+    [503, "The analysis service is busy."],
+  ])("maps HTTP %i to a helpful message", async (status, expected) => {
+    vi.stubEnv("VITE_API_URL", "https://screening.example.test");
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response(JSON.stringify({ detail: "raw detail" }), { status }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(analyzeResumes("Test job description", [])).rejects.toThrow(expected);
+    expect(fetchMock).toHaveBeenCalledTimes(status === 503 ? 2 : 1);
+  });
+
+  it("aborts requests at the configured timeout", async () => {
+    vi.stubEnv("VITE_API_URL", "https://screening.example.test");
+    const fetchMock = vi.fn<typeof fetch>(
+      (_input, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            reject(new DOMException("Aborted", "AbortError"));
+          });
+        }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(analyzeResumes("Test job description", [], { timeoutMs: 10 })).rejects.toThrow(
+      "Analysis timed out",
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

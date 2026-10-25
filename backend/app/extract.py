@@ -179,6 +179,7 @@ def extract_pdf(
         filename: str = "resume.pdf",
         min_chars: int = 200,
         hidden_size: float = 2.0,
+        max_pages: int | None = None,
 ) -> Extracted:
     fallback = name_from_filename(filename)
     if not data.startswith(PDF_MAGIC):
@@ -197,6 +198,11 @@ def extract_pdf(
         if doc.is_encrypted and not doc.is_pdf:
             return Extracted(
                 text="", flags=["invalid_pdf"], status="error",
+                candidate_name=fallback, heading="",
+            )
+        if max_pages is not None and len(doc) > max_pages:
+            return Extracted(
+                text="", flags=["too_many_pages"], status="error",
                 candidate_name=fallback, heading="",
             )
         flags: list[str] = []

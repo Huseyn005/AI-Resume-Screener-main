@@ -3,22 +3,41 @@
 ## Setup and run
 
 From the repository root, create and activate the backend virtual environment,
-install the pinned dependencies, and copy the environment template:
+install dependencies, and copy the environment template. For local GPU
+training, install `requirements-ml.txt` before `requirements.txt`; server and
+CI environments use CPU-only torch before `requirements.txt` instead:
 
 ```powershell
 cd backend
 python -m venv venv
 .\venv\Scripts\Activate.ps1
-python -m pip install -r requirements-ml.txt
+python -m pip install -r requirements-ml.txt  # local GPU/training
 python -m pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
 
+For a CPU-only server or CI environment, replace the two install commands
+above with:
+
+```powershell
+python -m pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r requirements.txt
+```
+
 By default, `ALLOWED_ORIGINS` includes `https://pushcv.vercel.app`,
+`https://statcv.vercel.app`, `https://pullcv.vercel.app`,
+`https://taphire.vercel.app`, `https://dragcv.vercel.app`,
 `http://localhost:5173`, and `http://localhost:8080`. Override it with a
 comma-separated list of allowed browser origins for your deployment.
+`ALLOWED_ORIGIN_REGEX` defaults to empty and can allow Vercel previews, for
+example `^https://pushcv(-[a-z0-9-]+)*\.vercel\.app$`.
 `EMBED_MODEL` defaults to `sentence-transformers/all-MiniLM-L6-v2`; the model
-is downloaded on first use if it is not cached locally.
+is baked into the Docker image at build time and used offline at runtime.
+Fine-tuned models are trained locally, uploaded with `calibrator.pkl` to a
+private Hugging Face model repo, and downloaded when the Space starts.
+Training never runs on the server. Do not override `EMBED_MODEL` on the host.
+Resource and rate-limit defaults are documented in
+[docs/deployment.md](../docs/deployment.md).
 
 Start the API from `backend/`:
 
@@ -30,6 +49,8 @@ The API exposes `GET /health` and `POST /analyze`. Health reports the loaded
 model and whether the semantic calibrator is loaded. The analyze endpoint
 accepts a `job_description` form field and one or more PDF files in the
 `resumes` form field. Job descriptions must contain 50-10,000 characters.
+Container deployments bake the configured `EMBED_MODEL` into the image for
+offline cold starts.
 
 Score explanations are disabled by default. Set `DEBUG_ENDPOINTS=1` to enable
 the additional `debug` field from `POST /analyze?debug=true`; the normal
@@ -116,6 +137,7 @@ The response does not include duplicate `breakdown` or `missing` fields.
 Run the backend tests from this directory:
 
 ```powershell
+python -m pip install -r requirements-dev.txt
 python -m pytest
 ```
 
@@ -137,5 +159,5 @@ python -m pytest
 The first training command is a fast smoke test; the second performs the
 configured training run. Evaluation writes `ml/results.json`,
 `ml/REPORT.md`, and `ml/score_distribution.png`. Training and calibration
-write `models/finetuned/` and `models/calibrator.pkl`, which the API loads
-automatically when present.
+write `models/finetuned/` (including `calibrator.pkl`), which can be uploaded
+as one folder to the private model repo used by the deployment.

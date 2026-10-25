@@ -88,7 +88,14 @@ function ScreenPage() {
     setProgress(0);
     try {
       const results = await runScreening((d, t) => setProgress(Math.round((d / t) * 100)));
-      toast.success(`${results.length} resumes analyzed successfully.`);
+      const failures = results.filter((candidate) => candidate.status === "error").length;
+      if (failures > 0) {
+        toast.warning(
+          `${results.length - failures} resumes analyzed; ${failures} could not be analyzed.`,
+        );
+      } else {
+        toast.success(`${results.length} resumes analyzed successfully.`);
+      }
       setTimeout(
         () => document.getElementById("results")?.scrollIntoView({ behavior: "smooth" }),
         50,

@@ -34,3 +34,4 @@ class HealthResponse(BaseModel):
     status: str
     model: str
     calibrator_loaded: bool
+    model_source: str | None = None

@@ -475,7 +475,7 @@ def test_short_job_description_returns_422(client: TestClient) -> None:
     assert response.status_code == 422
 
 
-def test_text_upload_returns_415(client: TestClient) -> None:
+def test_text_upload_returns_unsupported_result(client: TestClient) -> None:
     response = client.post(
         "/analyze",
         data={"job_description": JOB_DESCRIPTION},
@@ -483,7 +483,10 @@ def test_text_upload_returns_415(client: TestClient) -> None:
             ("resumes", ("resume.txt", b"not a PDF", "text/plain"))
         ],
     )
-    assert response.status_code == 415
+    assert response.status_code == 200
+    result = response.json()["results"][0]
+    assert result["status"] == "error"
+    assert result["flags"] == ["unsupported_type"]
 
 
 def test_reason_has_two_sentences_and_omits_other_section() -> None:

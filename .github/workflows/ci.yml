@@ -2,9 +2,26 @@ name: CI
 
 on:
   push:
+    branches: [master]
   pull_request:
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+
   frontend:
     runs-on: ubuntu-latest
     defaults:
@@ -21,3 +38,50 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install -r backend/requirements-dev.txt
+      - run: python -m pytest
+        working-directory: backend
+
+  docker:
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: backend
+          load: true
+          tags: shortlist-backend:test
+          build-args: |
+            TORCH_VERSION=2.9.1
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - run: docker run -d --name shortlist-backend -p 8000:8000 shortlist-backend:test
+      - name: Wait for backend health
+        run: |
+          for attempt in $(seq 1 300); do
+            if curl --fail --silent http://127.0.0.1:8000/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs shortlist-backend
+          exit 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pymupdf==1.28.2
+      - run: python backend/tools/smoke_test.py --url http://127.0.0.1:8000
+      - if: always()
+        run: docker rm --force shortlist-backend

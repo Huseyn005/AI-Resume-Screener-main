@@ -38,8 +38,8 @@ Copy-Item .env.example .env
 uvicorn app.main:app --port 8000
 ```
 
-Set `ALLOWED_ORIGINS` to the frontend origin in `backend/.env`. The checked-in
-template lists `http://localhost:8080` and `http://localhost:5173`.
+Set `ALLOWED_ORIGINS` to the frontend origin(s) in `backend/.env`; its template
+contains the existing Vercel domains and both local development origins.
 
 ### Frontend
 
@@ -74,7 +74,9 @@ contract and additional setup details are documented in
 
 The Vercel project builds the SPA from `frontend/` using the root
 [`vercel.json`](vercel.json) configuration. Set `VITE_API_URL` in the Vercel
-environment to a reachable API URL. Backend hosting is not configured in this
-repository. See [docs/deployment.md](docs/deployment.md) and
+environment to the public HTTPS backend URL and redeploy. See
+[docs/deployment.md](docs/deployment.md) and
 [docs/local-testing-with-ngrok.md](docs/local-testing-with-ngrok.md) for
-deployment and preview testing instructions.
+deployment and preview testing instructions. The root `vercel.json` is active
+when Vercel's Root Directory is the repository; keep `frontend/vercel.json` as
+the dashboard fallback when the Root Directory is `frontend`.

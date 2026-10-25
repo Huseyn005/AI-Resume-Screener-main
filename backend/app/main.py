@@ -1,9 +1,23 @@
 from __future__ import annotations
+import asyncio
+import hashlib
 import logging
+import math
+import time
+from collections import deque
 from contextlib import asynccontextmanager
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
+from fastapi import (
+    FastAPI,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    Request,
+    UploadFile,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import numpy as np
@@ -57,13 +71,40 @@ ALLOWED_TYPES = {
 }
 JD_MIN, JD_MAX = 50, 10000
 MAX_FILES, MIN_FILES = 30, 1
+RATE_WINDOW_SECONDS = 60
+MAX_TRACKED_CLIENTS = 10_000
+
+
+@dataclass
+class ScorePreparation:
+    chunks: list[tuple[str, str]]
+    jd_chunks: list[str]
+    resume_texts: list[str]
+    exp_chunks: list[str]
+    jd_skills: list[str]
+    phrases: list[str]
+    unlisted_requirements: list[str]
+    semantic_unmatched: list[str]
+    lexical: list[str]
+    resume_skills: list[str]
+    sections: dict[str, str]
+    jd_skill_weights: dict[str, float]
+    jd_soft_skills: list[str]
+    hard_skill_count: int
+    batch: list[str]
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
     app.state.settings = settings
+    app.state.analysis_semaphore = asyncio.Semaphore(
+        settings.max_concurrent_analyses
+    )
+    app.state.rate_limit_hits = {}
+    app.state.rate_limit_lock = asyncio.Lock()
     app.state.model_name = model_name(settings)
+    app.state.model_source = settings.model_source()
     app.state.model = load_model(settings)
     app.state.calibrator = (
         load_calibrator(settings)
@@ -71,17 +112,66 @@ async def lifespan(app: FastAPI):
     )
     app.state.calibrator_loaded = app.state.calibrator is not None
     app.state.lexicon = load_skills()
+    log.info(
+        "model startup source=%s name=%s calibrator_loaded=%s",
+        settings.model_source(),
+        app.state.model_name,
+        "yes" if app.state.calibrator_loaded else "no",
+    )
+    if not app.state.calibrator_loaded:
+        log.warning("semantic calibrator is off")
     yield
     app.state.model = None
 
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    logging.basicConfig(level=settings.log_level.upper())
+    log.setLevel(settings.log_level.upper())
     app = FastAPI(title="Shortlist Screener", lifespan=lifespan)
+
+    @app.middleware("http")
+    async def reject_oversized_request(request: Request, call_next):
+        if request.method == "POST" and request.url.path == "/analyze":
+            active_settings = (
+                getattr(request.app.state, "settings", None)
+                or get_settings()
+            )
+            if active_settings.log_level.upper() == "DEBUG":
+                client, forwarded_count = _resolved_client(
+                    request, active_settings
+                )
+                client_hash = hashlib.sha256(
+                    client.encode("utf-8", errors="replace")
+                ).hexdigest()[:10]
+                log.debug(
+                    "analyze client forwarded_for_entries=%d "
+                    "client_hash=%s",
+                    forwarded_count,
+                    client_hash,
+                )
+            content_length = request.headers.get("content-length")
+            if content_length is not None:
+                try:
+                    if int(content_length) > active_settings.max_request_bytes:
+                        return JSONResponse(
+                            status_code=413,
+                            content={
+                                "detail": "Request exceeds the maximum size"
+                            },
+                        )
+                except ValueError:
+                    return JSONResponse(
+                        status_code=400,
+                        content={"detail": "Invalid Content-Length"},
+                    )
+        return await call_next(request)
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.origin_list(),
-        allow_credentials=True,
+        allow_origin_regex=settings.allowed_origin_regex or None,
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )
@@ -97,16 +187,27 @@ async def health() -> HealthResponse:
         status="ok",
         model=getattr(app.state, "model_name", ""),
         calibrator_loaded=getattr(app.state, "calibrator_loaded", False),
+        model_source=getattr(
+            app.state, "model_source", get_settings().model_source()
+        ),
     )
 
 
 @app.post("/analyze", response_model=AnalyzeResponse)
 async def analyze(
+        request: Request,
         job_description: str = Form(...),
         resumes: list[UploadFile] = File(...),
         debug: bool = Query(False),
 ) -> AnalyzeResponse | JSONResponse:
     settings = getattr(app.state, "settings", None) or get_settings()
+    retry_after = await _rate_limit_retry_after(request, settings)
+    if retry_after is not None:
+        return JSONResponse(
+            status_code=429,
+            headers={"Retry-After": str(retry_after)},
+            content={"detail": "Analysis rate limit exceeded"},
+        )
     if debug and not settings.debug_endpoints:
         raise HTTPException(
             status_code=403,
@@ -119,20 +220,47 @@ async def analyze(
             content={"detail": "job_description must be 50-10000 chars"},
         )
     files = resumes or []
-    if not (MIN_FILES <= len(files) <= MAX_FILES):
+    if not (MIN_FILES <= len(files) <= settings.max_files):
         return JSONResponse(
             status_code=422,
-            content={"detail": "resumes must contain 1-30 PDFs"},
+            content={
+                "detail": f"resumes must contain 1-{settings.max_files} PDFs"
+            },
+        )
+    semaphore = getattr(app.state, "analysis_semaphore", None)
+    if semaphore is None:
+        semaphore = asyncio.Semaphore(settings.max_concurrent_analyses)
+        app.state.analysis_semaphore = semaphore
+    try:
+        await asyncio.wait_for(
+            semaphore.acquire(), timeout=settings.queue_timeout_seconds
+        )
+    except asyncio.TimeoutError:
+        return JSONResponse(
+            status_code=503,
+            headers={"Retry-After": "1"},
+            content={"detail": "Analysis queue is full; retry shortly"},
         )
     results: list[AnalyzeResult] = []
     explanations: list[dict[str, Any]] = []
-    for upload in files:
-        if debug:
-            result, detail = await _analyze_one(upload, jd, explain=True)
-            results.append(result)
-            explanations.append(detail)
-        else:
-            results.append(await _analyze_one(upload, jd))
+    byte_budget = [settings.max_request_bytes]
+    try:
+        for index, upload in enumerate(files):
+            if debug:
+                result, detail = await _analyze_one(
+                    upload, jd, explain=True,
+                    file_index=index, byte_budget=byte_budget,
+                )
+                results.append(result)
+                explanations.append(detail)
+            else:
+                results.append(await _analyze_one(
+                    upload, jd, file_index=index, byte_budget=byte_budget,
+                ))
+    except HTTPException:
+        raise
+    finally:
+        semaphore.release()
     order = sorted(
         range(len(results)),
         key=lambda index: results[index].match_percentage,
@@ -152,30 +280,38 @@ async def _analyze_one(
         upload: UploadFile,
         jd: str,
         explain: bool = False,
+        file_index: int = 0,
+        byte_budget: list[int] | None = None,
 ) -> AnalyzeResult | tuple[AnalyzeResult, dict[str, Any]]:
     filename = upload.filename or "resume.pdf"
     content_type = (upload.content_type or "").split(";")[0].strip().lower()
-    if (
+    unsupported = (
         Path(filename).suffix.lower() != ".pdf"
         or (content_type and content_type not in ALLOWED_TYPES)
-    ):
-        raise HTTPException(
-            status_code=415, detail="Only PDF resumes are supported"
-        )
+    )
     settings: Settings = app.state.settings
     try:
-        data = await upload.read()
+        budget = byte_budget or [settings.max_request_bytes]
+        data = await _read_upload(upload, settings, budget)
+        if unsupported:
+            result = _stub(
+                filename, ["unsupported_type"], "error",
+                reason="Only PDF resumes are supported.",
+            )
+            return _with_explanation(result, explain, settings, jd)
         if len(data) > settings.max_pdf_bytes:
             result = _stub(filename, ["too_large"], "error")
             return _with_explanation(result, explain, settings, jd)
         if not _valid_pdf(upload.content_type, data):
             result = _stub(filename, ["invalid_pdf"], "error")
             return _with_explanation(result, explain, settings, jd)
-        extracted = extract_pdf(
+        extracted = await asyncio.to_thread(
+            extract_pdf,
             data,
             filename,
             settings.min_text_chars,
             settings.hidden_font_size,
+            settings.max_pdf_pages,
         )
         if extracted.status == "error":
             result = _stub(
@@ -200,10 +336,93 @@ async def _analyze_one(
             extracted.candidate_name, jd, settings,
             include_debug=explain,
         )
+    except HTTPException:
+        raise
     except Exception:
-        log.exception("resume failed filename=%s", filename)
+        filename_hash = hashlib.sha256(
+            filename.encode("utf-8", errors="replace")
+        ).hexdigest()[:10]
+        log.exception(
+            "resume failed file_index=%d filename_hash=%s",
+            file_index,
+            filename_hash,
+        )
         result = _stub(filename, ["invalid_pdf"], "error")
         return _with_explanation(result, explain, settings, jd)
+
+
+async def _read_upload(
+        upload: UploadFile,
+        settings: Settings,
+        byte_budget: list[int],
+) -> bytes:
+    request_remaining = byte_budget[0]
+    limit = min(settings.max_pdf_bytes, request_remaining)
+    data = bytearray()
+    while len(data) <= limit:
+        chunk = await upload.read(min(64 * 1024, limit + 1 - len(data)))
+        if not chunk:
+            break
+        data.extend(chunk)
+    if len(data) > request_remaining:
+        raise HTTPException(
+            status_code=413,
+            detail="Request exceeds the maximum size",
+        )
+    byte_budget[0] -= len(data)
+    return bytes(data)
+
+
+async def _rate_limit_retry_after(
+        request: Request,
+        settings: Settings,
+) -> int | None:
+    limit = settings.rate_limit_per_minute
+    if limit == 0:
+        return None
+    client, _forwarded_count = _resolved_client(request, settings)
+    hits = app.state.rate_limit_hits
+    now = time.monotonic()
+    async with app.state.rate_limit_lock:
+        for known_client, known_hits in list(hits.items()):
+            while (
+                known_hits
+                and now - known_hits[0] >= RATE_WINDOW_SECONDS
+            ):
+                known_hits.popleft()
+            if not known_hits:
+                del hits[known_client]
+        while client not in hits and len(hits) >= MAX_TRACKED_CLIENTS:
+            least_recent_client = min(
+                hits,
+                key=lambda known_client: hits[known_client][-1],
+            )
+            del hits[least_recent_client]
+        client_hits = hits.setdefault(client, deque())
+        if len(client_hits) >= limit:
+            return max(
+                1, math.ceil(RATE_WINDOW_SECONDS - (now - client_hits[0]))
+            )
+        client_hits.append(now)
+    return None
+
+
+def _resolved_client(
+        request: Request,
+        settings: Settings,
+) -> tuple[str, int]:
+    forwarded_values = [
+        value.strip()
+        for value in request.headers.get("x-forwarded-for", "").split(",")
+        if value.strip()
+    ]
+    forwarded_count = len(forwarded_values)
+    trusted_count = settings.trusted_proxy_count
+    if trusted_count and forwarded_count >= trusted_count:
+        client = forwarded_values[-trusted_count]
+    else:
+        client = request.client.host if request.client else "unknown"
+    return client, forwarded_count
 
 
 def _with_explanation(
@@ -269,83 +488,24 @@ async def _score_text(
 ) -> AnalyzeResult | tuple[AnalyzeResult, dict[str, Any]]:
     model = app.state.model
     lexicon = app.state.lexicon
-    model_limit = getattr(model, "max_seq_length", None)
-    if model_limit is None:
-        model_limit = settings.chunk_tokens
-    chunk_size = max(
-        1, min(settings.chunk_tokens, int(model_limit))
+    prep = await asyncio.to_thread(
+        _prepare_score, raw_text, candidate_name, jd, settings, model, lexicon
     )
-    tokenizer = getattr(model, "tokenizer", None)
-    token_counter = None
-    if tokenizer is not None:
-        def token_counter(chunk: str) -> int:
-            return len(tokenizer.encode(
-                chunk, add_special_tokens=True, verbose=False
-            ))
-
-    name_key = candidate_name.strip().casefold()
-    scoring_text = "\n".join(
-        line for line in raw_text.splitlines()
-        if not name_key or line.strip().casefold() != name_key
-    )
-    text = scrub_pii(strip_invisible_unicode(scoring_text))
-    jd_clean = scrub_pii(strip_invisible_unicode(jd))
-    sections = split_sections(text)
-    chunks = all_chunks(
-        sections, chunk_size, settings.chunk_overlap, token_counter
-    )
-    jd_chunks = chunk_text(
-        jd_clean, chunk_size, settings.chunk_overlap, token_counter
-    )
-    if not jd_chunks:
-        jd_chunks = [jd_clean] if jd_clean else []
-    jd_all_skills = extract_lexical(jd_clean, lexicon)
-    jd_skill_weights = skill_weights(jd_clean, lexicon)
-    hard_skill_count = len(jd_skill_weights)
-    jd_soft_skills = [
-        skill for skill in jd_all_skills
-        if lexicon.skill_types.get(skill) == "soft"
-    ]
-    if hard_skill_count < settings.min_hard_skills:
-        for skill in jd_soft_skills:
-            jd_skill_weights.setdefault(skill, 0.5)
-    jd_skills = list(jd_skill_weights)
-    jd_domains = domains_from_skills(jd_clean, jd_all_skills, lexicon)
-    resume_skills = technical_skills(
-        extract_lexical(text, lexicon), lexicon
-    )
-    resume_set = set(extract_lexical(text, lexicon))
-    lexical = [s for s in jd_skills if s in resume_set]
-    unmatched = [s for s in jd_skills if s not in resume_set]
-    semantic_unmatched = [
-        skill for skill in unmatched
-        if (
-            lexicon.skill_types.get(skill, "hard") == "hard"
-            and domain_allows(skill, jd_domains, lexicon)
-        )
-    ]
-    unlisted_requirements = extract_unlisted_requirements(
-        jd_clean, lexicon
-    )
-    phrases = [
-        phrase for phrase in noun_phrases(text)
-        if extract_lexical(phrase, lexicon)
-    ]
-    exp_proj = " ".join(
-        p for p in (
-            sections.get("experience"), sections.get("projects"),
-        ) if p
-    )
-    section_text = exp_proj or text
-    exp_chunks = chunk_text(
-        section_text, chunk_size, settings.chunk_overlap, token_counter
-    ) if section_text else []
-    resume_texts = [c[1] for c in chunks]
-    batch = (
-        jd_chunks + resume_texts + exp_chunks + jd_skills + phrases
-        + unlisted_requirements
-    )
-    emb = await encode_texts(model, batch)
+    chunks = prep.chunks
+    jd_chunks = prep.jd_chunks
+    resume_texts = prep.resume_texts
+    exp_chunks = prep.exp_chunks
+    jd_skills = prep.jd_skills
+    phrases = prep.phrases
+    unlisted_requirements = prep.unlisted_requirements
+    semantic_unmatched = prep.semantic_unmatched
+    lexical = prep.lexical
+    resume_skills = prep.resume_skills
+    sections = prep.sections
+    jd_skill_weights = prep.jd_skill_weights
+    jd_soft_skills = prep.jd_soft_skills
+    hard_skill_count = prep.hard_skill_count
+    emb = await encode_texts(model, prep.batch)
     n_jd, n_res, n_exp = (
         len(jd_chunks), len(resume_texts), len(exp_chunks),
     )
@@ -593,6 +753,105 @@ async def _score_text(
         "status": result.status,
     }
     return result, detail
+
+
+def _prepare_score(
+        raw_text: str,
+        candidate_name: str,
+        jd: str,
+        settings: Settings,
+        model: Any,
+        lexicon: Any,
+) -> ScorePreparation:
+    model_limit = getattr(model, "max_seq_length", None)
+    if model_limit is None:
+        model_limit = settings.chunk_tokens
+    chunk_size = max(1, min(settings.chunk_tokens, int(model_limit)))
+    tokenizer = getattr(model, "tokenizer", None)
+    token_counter = None
+    if tokenizer is not None:
+        def token_counter(chunk: str) -> int:
+            return len(tokenizer.encode(
+                chunk, add_special_tokens=True, verbose=False
+            ))
+
+    name_key = candidate_name.strip().casefold()
+    scoring_text = "\n".join(
+        line for line in raw_text.splitlines()
+        if not name_key or line.strip().casefold() != name_key
+    )
+    text = scrub_pii(strip_invisible_unicode(scoring_text))
+    jd_clean = scrub_pii(strip_invisible_unicode(jd))
+    sections = split_sections(text)
+    chunks = all_chunks(
+        sections, chunk_size, settings.chunk_overlap, token_counter
+    )
+    jd_chunks = chunk_text(
+        jd_clean, chunk_size, settings.chunk_overlap, token_counter
+    )
+    if not jd_chunks:
+        jd_chunks = [jd_clean] if jd_clean else []
+    jd_all_skills = extract_lexical(jd_clean, lexicon)
+    jd_skill_weights = skill_weights(jd_clean, lexicon)
+    hard_skill_count = len(jd_skill_weights)
+    jd_soft_skills = [
+        skill for skill in jd_all_skills
+        if lexicon.skill_types.get(skill) == "soft"
+    ]
+    if hard_skill_count < settings.min_hard_skills:
+        for skill in jd_soft_skills:
+            jd_skill_weights.setdefault(skill, 0.5)
+    jd_skills = list(jd_skill_weights)
+    jd_domains = domains_from_skills(jd_clean, jd_all_skills, lexicon)
+    resume_skills = technical_skills(
+        extract_lexical(text, lexicon), lexicon
+    )
+    resume_set = set(extract_lexical(text, lexicon))
+    lexical = [skill for skill in jd_skills if skill in resume_set]
+    unmatched = [skill for skill in jd_skills if skill not in resume_set]
+    semantic_unmatched = [
+        skill for skill in unmatched
+        if (
+            lexicon.skill_types.get(skill, "hard") == "hard"
+            and domain_allows(skill, jd_domains, lexicon)
+        )
+    ]
+    unlisted_requirements = extract_unlisted_requirements(jd_clean, lexicon)
+    phrases = [
+        phrase for phrase in noun_phrases(text)
+        if extract_lexical(phrase, lexicon)
+    ]
+    exp_proj = " ".join(
+        part for part in (
+            sections.get("experience"), sections.get("projects"),
+        ) if part
+    )
+    section_text = exp_proj or text
+    exp_chunks = chunk_text(
+        section_text, chunk_size, settings.chunk_overlap, token_counter
+    ) if section_text else []
+    resume_texts = [chunk[1] for chunk in chunks]
+    batch = (
+        jd_chunks + resume_texts + exp_chunks + jd_skills + phrases
+        + unlisted_requirements
+    )
+    return ScorePreparation(
+        chunks=chunks,
+        jd_chunks=jd_chunks,
+        resume_texts=resume_texts,
+        exp_chunks=exp_chunks,
+        jd_skills=jd_skills,
+        phrases=phrases,
+        unlisted_requirements=unlisted_requirements,
+        semantic_unmatched=semantic_unmatched,
+        lexical=lexical,
+        resume_skills=resume_skills,
+        sections=sections,
+        jd_skill_weights=jd_skill_weights,
+        jd_soft_skills=jd_soft_skills,
+        hard_skill_count=hard_skill_count,
+        batch=batch,
+    )
 
 
 def _best_section(
